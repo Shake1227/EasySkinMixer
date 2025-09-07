@@ -1,7 +1,17 @@
-// EasySkinMixer - Main Logic
-// (c) 2025
+// EasySkinMixer - Main Logic (with Debugging)
+console.log("EasySkinMixer: スクリプト開始");
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("EasySkinMixer: DOM読み込み完了");
+
+    // 3Dビューワーライブラリの存在チェック
+    if (typeof skinview3d === 'undefined') {
+        console.error("致命的エラー: skinview3dライブラリが見つかりません。index.htmlのscriptタグを確認してください。");
+        alert("エラー: 3Dプレビューライブラリの読み込みに失敗しました。");
+        return;
+    }
+    console.log("EasySkinMixer: skinview3dライブラリを検出");
+
     // UI要素の取得
     const eventNameEl = document.getElementById('event-name');
     const eventLogoEl = document.getElementById('event-logo');
@@ -9,31 +19,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploader = document.getElementById('user-skin-upload');
     const fileNameEl = document.getElementById('file-name');
     const previewArea = document.getElementById('preview-area');
-    const canvas = document.getElementById('skin-canvas'); // 非表示の合成用Canvas
+    const canvas = document.getElementById('skin-canvas');
     const downloadButton = document.getElementById('download-button');
     const errorMessageEl = document.getElementById('error-message');
     const mixerUiEl = document.getElementById('mixer-ui');
     const loadingMessageEl = document.getElementById('loading-message');
 
     const ctx = canvas.getContext('2d');
+    let skinViewer;
 
-    // 3Dビューワーの初期化
-    let skinViewer = new skinview3d.SkinViewer({
-        domElement: document.getElementById("skin-viewer-container"),
-        width: 280,
-        height: 350
-    });
-    // ビューワーのコントロール設定 (マウスでの回転・ズーム)
-    let control = skinview3d.createOrbitControls(skinViewer);
-    control.enableRotate = true;
-    control.enableZoom = true;
-    control.enablePan = false;
-    // アニメーション設定 (歩行)
-    let walk = skinViewer.animations.add(skinview3d.WalkingAnimation);
+    try {
+        skinViewer = new skinview3d.SkinViewer({
+            domElement: document.getElementById("skin-viewer-container"),
+            width: 280,
+            height: 350
+        });
+        let control = skinview3d.createOrbitControls(skinViewer);
+        control.enableRotate = true;
+        control.enableZoom = true;
+        control.enablePan = false;
+        skinViewer.animations.add(skinview3d.WalkingAnimation);
+        console.log("EasySkinMixer: 3Dビューワーの初期化成功");
+    } catch (e) {
+        console.error("EasySkinMixer: 3Dビューワーの初期化中にエラー発生", e);
+        showError("3Dプレビューの初期化に失敗しました。");
+        return;
+    }
 
-    // URLから企画IDを取得
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get('event');
+    console.log(`EasySkinMixer: URLから取得した企画ID: ${eventId}`);
 
     if (!eventId) {
         showError('無効なURLです。企画IDが指定されていません。');
@@ -41,12 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const currentEvent = EVENTS.find(e => e.id === eventId);
+    console.log("EasySkinMixer: 該当する企画情報:", currentEvent);
+
     if (!currentEvent) {
         showError('指定された企画が見つかりませんでした。');
         return;
     }
 
-    // 企画情報をページに反映
     eventNameEl.textContent = currentEvent.name;
     descriptionEl.textContent = `あなたのスキンをアップロードして、「${currentEvent.name}」限定スキンと合成しよう！`;
     if (currentEvent.logo) {
@@ -54,29 +70,34 @@ document.addEventListener('DOMContentLoaded', () => {
         eventLogoEl.style.display = 'block';
     }
 
-    // 企画スキン画像を読み込み
     const costumeImg = new Image();
     costumeImg.crossOrigin = "anonymous";
-    costumeImg.src = currentEvent.skin;
-    
     costumeImg.onload = () => {
+        console.log(`EasySkinMixer: 企画スキン画像の読み込み成功: ${costumeImg.src}`);
         loadingMessageEl.style.display = 'none';
         mixerUiEl.style.display = 'block';
-        // ページ読み込み時に企画スキンをプレビュー表示
-        skinViewer.loadSkin(costumeImg.src);
+        try {
+            skinViewer.loadSkin(costumeImg.src);
+            console.log("EasySkinMixer: 3Dビューワーへのスキン適用成功");
+        } catch (e) {
+            console.error("EasySkinMixer: 3Dビューワーへのスキン適用中にエラー発生", e);
+            showError("3Dプレビューの表示中にエラーが発生しました。");
+        }
     };
     costumeImg.onerror = () => {
+        console.error(`EasySkinMixer: 企画スキン画像の読み込み失敗。パスを確認してください: ${currentEvent.skin}`);
         showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。');
     };
+    
+    console.log(`EasySkinMixer: 企画スキン画像の読み込みを開始: ${currentEvent.skin}`);
+    costumeImg.src = currentEvent.skin;
 
-    // ファイルアップロード時の処理
     uploader.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         fileNameEl.textContent = file.name;
         errorMessageEl.textContent = '';
-
         const reader = new FileReader();
         reader.onload = (event) => {
             const userSkinImg = new Image();
@@ -89,47 +110,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 mixSkins(userSkinImg, costumeImg);
                 previewArea.style.display = 'block';
             };
-            userSkinImg.onerror = () => {
-                showError('画像の読み込みに失敗しました。有効なPNGファイルを選択してください。');
-            };
             userSkinImg.src = event.target.result;
         };
         reader.readAsDataURL(file);
     });
 
-    /**
-     * 【更新】スキンを合成する関数
-     * @param {HTMLImageElement} userSkin - ユーザーのスキン画像
-     * @param {HTMLImageElement} costume - 企画の服装スキン画像
-     */
     function mixSkins(userSkin, costume) {
-        // キャンバスをクリア
         ctx.clearRect(0, 0, 64, 64);
-
-        // 1. 服装スキンを全体に描画
         ctx.drawImage(costume, 0, 0);
-
-        // 2. 服装スキンの頭部全体（レイヤー1, 2）を一度透明にする
-        // マイクラスキンの頭部データは画像のY座標0から15ピクセルの範囲
         ctx.clearRect(0, 0, 64, 16);
-
-        // 3. ユーザースキンの頭部全体（レイヤー1, 2）を上から描画
         ctx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
-        
-        // 合成後のスキン画像のURLを生成
         const mixedSkinUrl = canvas.toDataURL('image/png');
-
-        // 4. 3Dプレビューを更新
         skinViewer.loadSkin(mixedSkinUrl);
-
-        // 5. ダウンロードリンクを更新
         downloadButton.href = mixedSkinUrl;
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
     }
 
-    /**
-     * エラーメッセージを表示する関数
-     */
     function showError(message) {
         mixerUiEl.style.display = 'none';
         loadingMessageEl.style.display = 'none';
