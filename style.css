@@ -23,18 +23,28 @@ body {
 
 header {
     margin-bottom: 1.5rem;
+    /* ロゴとタイトルを中央に配置 */
+    display: flex;
+    flex-direction: column; /* 縦に並べる */
+    align-items: center; /* 水平方向中央 */
 }
 
 #event-name {
     font-size: 2rem;
     color: #1a73e8;
-    margin: 0 0 10px 0;
+    margin: 10px 0 0 0; /* ロゴとタイトルの間に少し余白 */
+    white-space: nowrap; /* ★ここを修正: 長いテキストも改行しない */
+    overflow: hidden; /* ★ここを修正: はみ出た部分は隠す */
+    text-overflow: ellipsis; /* ★ここを修正: はみ出たら...で表示 */
+    max-width: 100%; /* 親要素の幅を超えないようにする */
 }
 
 #event-logo {
-    max-width: 150px;
-    max-height: 80px;
-    margin-top: 10px;
+    /* ★ここを修正: ロゴ画像を大きく、タイトルよりも上に表示 */
+    max-width: 250px; /* 最大幅を大きく */
+    max-height: 120px; /* 最大高さを大きく */
+    margin-bottom: 15px; /* タイトルとの間に少しスペース */
+    display: block; /* img要素をブロックレベルに */
 }
 
 .upload-area {
