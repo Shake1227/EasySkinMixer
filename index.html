@@ -26,7 +26,12 @@
 
             <div id="preview-area" style="display: none;">
                 <h2>プレビュー</h2>
-                <canvas id="skin-canvas" width="64" height="64"></canvas>
+                <p class="preview-note">（マウスでドラッグすると回転できます）</p>
+                
+                <div id="skin-viewer-container"></div>
+                
+                <canvas id="skin-canvas" width="64" height="64" style="display: none;"></canvas>
+
                 <a id="download-button" class="download-button" href="#" download="mixed_skin.png">ダウンロード</a>
             </div>
 
@@ -42,6 +47,7 @@
         <p>Powered by EasySkinMixer</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/skinview3d@latest/dist/skinview3d.bundle.js"></script>
     <script src="config.js"></script>
     <script src="main.js"></script>
 </body>
