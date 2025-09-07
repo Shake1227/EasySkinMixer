@@ -1,5 +1,4 @@
-// EasySkinMixer - Main Logic (バージョン3.2 - プレビュー描画を直接実行)
-console.log("EasySkinMixer: プレビュー直接描画バージョン3.2のスクリプトを読み込みました。");
+// EasySkinMixer - Main Logic (安定版 - 2Dプレビュー)
 
 document.addEventListener('DOMContentLoaded', () => {
     // UI要素の取得
@@ -9,15 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploader = document.getElementById('user-skin-upload');
     const fileNameEl = document.getElementById('file-name');
     const previewArea = document.getElementById('preview-area');
-    const skinCanvas = document.getElementById('skin-canvas'); // 合成・DL用 (非表示)
-    const previewCanvas = document.getElementById('preview-canvas'); // プレビュー用 (表示)
+    const skinCanvas = document.getElementById('skin-canvas');
     const downloadButton = document.getElementById('download-button');
     const errorMessageEl = document.getElementById('error-message');
     const mixerUiEl = document.getElementById('mixer-ui');
     const loadingMessageEl = document.getElementById('loading-message');
 
     const skinCtx = skinCanvas.getContext('2d');
-    const previewCtx = previewCanvas.getContext('2d');
 
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get('event');
@@ -66,12 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 
-                // 1. スキンを合成し、ダウンロードリンクを更新する
                 mixSkins(userSkinImg, costumeImg);
-
-                // 2. 合成が行われたCanvasを、直接プレビュー描画関数に渡す
-                drawPreview(skinCanvas);
-                
                 previewArea.style.display = 'block';
             };
             userSkinImg.src = event.target.result;
@@ -79,9 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(file);
     });
 
-    /**
-     * スキンを合成し、ダウンロードリンクを更新する関数
-     */
     function mixSkins(userSkin, costume) {
         skinCtx.clearRect(0, 0, 64, 64);
         skinCtx.drawImage(costume, 0, 0);
@@ -91,48 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const mixedSkinUrl = skinCanvas.toDataURL('image/png');
         downloadButton.href = mixedSkinUrl;
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
-    }
-
-    /**
-     * 【修正】合成Canvasから直接キャラクターのプレビューイラストを描画する関数
-     */
-    function drawPreview(sourceCanvas) { // 引数を画像からCanvasに変更
-        const scale = 10;
-        previewCanvas.width = 16 * scale;
-        previewCanvas.height = 32 * scale;
-        previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-
-        // ドット絵がぼやけないように設定
-        previewCtx.imageSmoothingEnabled = false;
-
-        const drawPart = (sx, sy, sw, sh, dx, dy, dw, dh, flip = false) => {
-            previewCtx.save();
-            if (flip) {
-                previewCtx.translate(previewCanvas.width, 0);
-                previewCtx.scale(-1, 1);
-                previewCtx.drawImage(sourceCanvas, sx, sy, sw, sh, (16 - dx - dw) * scale, dy * scale, dw * scale, dh * scale);
-            } else {
-                previewCtx.drawImage(sourceCanvas, sx, sy, sw, sh, dx * scale, dy * scale, dw * scale, dh * scale);
-            }
-            previewCtx.restore();
-        };
-
-        // 脚
-        drawPart(4, 20, 4, 12, 4, 20, 4, 12);
-        drawPart(4, 20, 4, 12, 8, 20, 4, 12, true);
-        drawPart(4, 36, 4, 12, 4, 20, 4, 12);
-        drawPart(4, 36, 4, 12, 8, 20, 4, 12, true);
-        // 腕
-        drawPart(44, 20, 4, 12, 0, 8, 4, 12);
-        drawPart(44, 20, 4, 12, 12, 8, 4, 12, true);
-        drawPart(60, 20, 4, 12, 0, 8, 4, 12);
-        drawPart(60, 20, 4, 12, 12, 8, 4, 12, true);
-        // 胴体
-        drawPart(20, 20, 8, 12, 4, 8, 8, 12);
-        drawPart(20, 36, 8, 12, 4, 8, 8, 12);
-        // 頭
-        drawPart(8, 8, 8, 8, 4, 0, 8, 8);
-        drawPart(40, 8, 8, 8, 4, 0, 8, 8);
     }
 
     function showError(message) {
