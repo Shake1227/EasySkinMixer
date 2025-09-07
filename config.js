@@ -5,7 +5,7 @@ const EVENTS = [
     {
         id: 'casino_suit', // 企画のID (URLに使われます。半角英数字で)
         name: 'カジノクラフト inメンシ「スーツ」', // 企画名
-        logo: '', // 企画ロゴのURL (なければ空文字)
+        logo: 'http://www.floral-village.info/up/1757264384.png', // 企画ロゴのURL (なければ空文字)
         skin: './skins/casino_suit.png' // 服装スキンのファイルパス
     },
     // --- 新しい企画を追加する場合は、この下にコピーして追記 ---
