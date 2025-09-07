@@ -9,13 +9,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploader = document.getElementById('user-skin-upload');
     const fileNameEl = document.getElementById('file-name');
     const previewArea = document.getElementById('preview-area');
-    const canvas = document.getElementById('skin-canvas');
+    const canvas = document.getElementById('skin-canvas'); // 非表示の合成用Canvas
     const downloadButton = document.getElementById('download-button');
     const errorMessageEl = document.getElementById('error-message');
     const mixerUiEl = document.getElementById('mixer-ui');
     const loadingMessageEl = document.getElementById('loading-message');
 
     const ctx = canvas.getContext('2d');
+
+    // 3Dビューワーの初期化
+    let skinViewer = new skinview3d.SkinViewer({
+        domElement: document.getElementById("skin-viewer-container"),
+        width: 280,
+        height: 350
+    });
+    // ビューワーのコントロール設定 (マウスでの回転・ズーム)
+    let control = skinview3d.createOrbitControls(skinViewer);
+    control.enableRotate = true;
+    control.enableZoom = true;
+    control.enablePan = false;
+    // アニメーション設定 (歩行)
+    let walk = skinViewer.animations.add(skinview3d.WalkingAnimation);
 
     // URLから企画IDを取得
     const params = new URLSearchParams(window.location.search);
@@ -26,9 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // 設定から該当する企画を検索
     const currentEvent = EVENTS.find(e => e.id === eventId);
-
     if (!currentEvent) {
         showError('指定された企画が見つかりませんでした。');
         return;
@@ -48,14 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
     costumeImg.src = currentEvent.skin;
     
     costumeImg.onload = () => {
-        // 読み込み完了後、UIを表示
         loadingMessageEl.style.display = 'none';
         mixerUiEl.style.display = 'block';
+        // ページ読み込み時に企画スキンをプレビュー表示
+        skinViewer.loadSkin(costumeImg.src);
     };
     costumeImg.onerror = () => {
         showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。');
     };
-
 
     // ファイルアップロード時の処理
     uploader.addEventListener('change', (e) => {
@@ -63,13 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!file) return;
 
         fileNameEl.textContent = file.name;
-        errorMessageEl.textContent = ''; // エラーメッセージをクリア
+        errorMessageEl.textContent = '';
 
         const reader = new FileReader();
         reader.onload = (event) => {
             const userSkinImg = new Image();
             userSkinImg.onload = () => {
-                // 画像のサイズチェック
                 if (userSkinImg.width !== 64 || userSkinImg.height !== 64) {
                     showError('スキンファイルは 64x64 ピクセルのPNG画像を選択してください。');
                     previewArea.style.display = 'none';
@@ -87,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /**
-     * スキンを合成する関数
+     * 【更新】スキンを合成する関数
      * @param {HTMLImageElement} userSkin - ユーザーのスキン画像
      * @param {HTMLImageElement} costume - 企画の服装スキン画像
      */
@@ -98,15 +109,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. 服装スキンを全体に描画
         ctx.drawImage(costume, 0, 0);
 
-        // 2. ユーザースキンから顔部分を服装スキンに上書き
-        // Minecraftスキンの頭部座標 (Java版 1.8以降のスリム/クラシック共通)
-        // 顔 正面 (8x8) at (8, 8)
-        ctx.drawImage(userSkin, 8, 8, 8, 8, 8, 8, 8, 8);
-        // 顔 髪レイヤー (8x8) at (40, 8)
-        ctx.drawImage(userSkin, 40, 8, 8, 8, 40, 8, 8, 8);
+        // 2. 服装スキンの頭部全体（レイヤー1, 2）を一度透明にする
+        // マイクラスキンの頭部データは画像のY座標0から15ピクセルの範囲
+        ctx.clearRect(0, 0, 64, 16);
 
-        // 3. ダウンロードリンクを更新
-        downloadButton.href = canvas.toDataURL('image/png');
+        // 3. ユーザースキンの頭部全体（レイヤー1, 2）を上から描画
+        ctx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
+        
+        // 合成後のスキン画像のURLを生成
+        const mixedSkinUrl = canvas.toDataURL('image/png');
+
+        // 4. 3Dプレビューを更新
+        skinViewer.loadSkin(mixedSkinUrl);
+
+        // 5. ダウンロードリンクを更新
+        downloadButton.href = mixedSkinUrl;
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
     }
 
