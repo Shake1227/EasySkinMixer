@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /**
-     * スキンを合成する関数
+     * 【変更点】スキンを合成する関数
      * @param {HTMLImageElement} userSkin - ユーザーのスキン画像
      * @param {HTMLImageElement} costume - 企画の服装スキン画像
      */
@@ -98,14 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // 1. 服装スキンを全体に描画
         ctx.drawImage(costume, 0, 0);
 
-        // 2. ユーザースキンから顔部分を服装スキンに上書き
-        // Minecraftスキンの頭部座標 (Java版 1.8以降のスリム/クラシック共通)
-        // 顔 正面 (8x8) at (8, 8)
-        ctx.drawImage(userSkin, 8, 8, 8, 8, 8, 8, 8, 8);
-        // 顔 髪レイヤー (8x8) at (40, 8)
-        ctx.drawImage(userSkin, 40, 8, 8, 8, 40, 8, 8, 8);
+        // 2. 服装スキンの頭部全体（レイヤー1, 2）を一度透明にする
+        // マイクラスキンの頭部データは画像のY座標0から15ピクセルの範囲です
+        ctx.clearRect(0, 0, 64, 16);
 
-        // 3. ダウンロードリンクを更新
+        // 3. ユーザースキンの頭部全体（レイヤー1, 2）を上から描画
+        ctx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
+
+        // 4. ダウンロードリンクを更新
         downloadButton.href = canvas.toDataURL('image/png');
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
     }
