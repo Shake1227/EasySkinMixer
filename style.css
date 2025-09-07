@@ -23,28 +23,22 @@ body {
 
 header {
     margin-bottom: 1.5rem;
-    /* ロゴとタイトルを中央に配置 */
-    display: flex;
-    flex-direction: column; /* 縦に並べる */
-    align-items: center; /* 水平方向中央 */
 }
 
 #event-name {
     font-size: 2rem;
     color: #1a73e8;
-    margin: 10px 0 0 0; /* ロゴとタイトルの間に少し余白 */
-    white-space: nowrap; /* ★ここを修正: 長いテキストも改行しない */
-    overflow: hidden; /* ★ここを修正: はみ出た部分は隠す */
-    text-overflow: ellipsis; /* ★ここを修正: はみ出たら...で表示 */
-    max-width: 100%; /* 親要素の幅を超えないようにする */
+    margin-top: 15px; /* ロゴとの間に余白 */
+    white-space: nowrap; /* 改行しない */
+    /* ★★以下の2行を削除し、「...」にならないようにしました★★ */
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
 }
 
 #event-logo {
-    /* ★ここを修正: ロゴ画像を大きく、タイトルよりも上に表示 */
-    max-width: 250px; /* 最大幅を大きく */
-    max-height: 120px; /* 最大高さを大きく */
-    margin-bottom: 15px; /* タイトルとの間に少しスペース */
-    display: block; /* img要素をブロックレベルに */
+    /* ★★ロゴのスタイルを調整★★ */
+    max-width: 250px;
+    max-height: 120px;
 }
 
 .upload-area {
@@ -85,11 +79,10 @@ input[type="file"] {
     margin-top: 2rem;
 }
 
-/* プレビュー用キャンバスのスタイル */
 #preview-canvas {
-    width: 160px;  /* キャラクターの幅 */
-    height: 320px; /* キャラクターの高さ */
-    image-rendering: pixelated; /* ドット絵をくっきり表示 */
+    width: 160px;
+    height: 320px;
+    image-rendering: pixelated;
     border: 1px solid #ddd;
     border-radius: 4px;
     background-color: #f7f7f7;
@@ -112,7 +105,7 @@ input[type="file"] {
     text-decoration: none;
     font-weight: 700;
     font-size: 1rem;
-    transition: background-color: 0.3s;
+    transition: background-color 0.3s;
     width: fit-content;
 }
 
