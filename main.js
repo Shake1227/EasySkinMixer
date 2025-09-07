@@ -1,5 +1,5 @@
-// EasySkinMixer - Main Logic
-// (c) 2025
+// EasySkinMixer - Main Logic (バージョン2.0)
+console.log("EasySkinMixer: 頭部全体を置き換えるバージョン2.0のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
     // UI要素の取得
@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
     costumeImg.src = currentEvent.skin;
     
     costumeImg.onload = () => {
-        // 読み込み完了後、UIを表示
         loadingMessageEl.style.display = 'none';
         mixerUiEl.style.display = 'block';
     };
@@ -56,20 +55,18 @@ document.addEventListener('DOMContentLoaded', () => {
         showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。');
     };
 
-
     // ファイルアップロード時の処理
     uploader.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
         fileNameEl.textContent = file.name;
-        errorMessageEl.textContent = ''; // エラーメッセージをクリア
+        errorMessageEl.textContent = '';
 
         const reader = new FileReader();
         reader.onload = (event) => {
             const userSkinImg = new Image();
             userSkinImg.onload = () => {
-                // 画像のサイズチェック
                 if (userSkinImg.width !== 64 || userSkinImg.height !== 64) {
                     showError('スキンファイルは 64x64 ピクセルのPNG画像を選択してください。');
                     previewArea.style.display = 'none';
@@ -78,41 +75,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 mixSkins(userSkinImg, costumeImg);
                 previewArea.style.display = 'block';
             };
-            userSkinImg.onerror = () => {
-                showError('画像の読み込みに失敗しました。有効なPNGファイルを選択してください。');
-            };
             userSkinImg.src = event.target.result;
         };
         reader.readAsDataURL(file);
     });
 
     /**
-     * 【変更点】スキンを合成する関数
-     * @param {HTMLImageElement} userSkin - ユーザーのスキン画像
-     * @param {HTMLImageElement} costume - 企画の服装スキン画像
+     * 【頭部全体を置き換える】スキン合成関数
      */
     function mixSkins(userSkin, costume) {
-        // キャンバスをクリア
         ctx.clearRect(0, 0, 64, 64);
-
-        // 1. 服装スキンを全体に描画
         ctx.drawImage(costume, 0, 0);
-
-        // 2. 服装スキンの頭部全体（レイヤー1, 2）を一度透明にする
-        // マイクラスキンの頭部データは画像のY座標0から15ピクセルの範囲です
-        ctx.clearRect(0, 0, 64, 16);
-
-        // 3. ユーザースキンの頭部全体（レイヤー1, 2）を上から描画
-        ctx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
-
-        // 4. ダウンロードリンクを更新
+        ctx.clearRect(0, 0, 64, 16); // 頭部全体をクリア
+        ctx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16); // ユーザーの頭部全体を描画
         downloadButton.href = canvas.toDataURL('image/png');
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
     }
 
-    /**
-     * エラーメッセージを表示する関数
-     */
     function showError(message) {
         mixerUiEl.style.display = 'none';
         loadingMessageEl.style.display = 'none';
