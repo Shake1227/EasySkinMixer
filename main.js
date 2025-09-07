@@ -86,9 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
     }
 
-    /**
-     * 【新機能】完成スキンからキャラクターのプレビューイラストを描画する関数
-     */
     function drawPreview(sourceCanvas) {
         const scale = 10;
         previewCanvas.width = 16 * scale;
