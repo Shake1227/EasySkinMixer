@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasySkinMixer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="event-name">EasySkinMixer</h1>
+            <img id="event-logo" src="" alt="企画ロゴ" style="display: none;">
+        </header>
+
+        <div id="mixer-ui">
+            <p id="description">下のボタンからあなたのスキンをアップロードして、限定スキンと合成しよう！</p>
+
+            <div class="upload-area">
+                <label for="user-skin-upload" class="upload-button">
+                    自分のスキンを選択
+                    <input type="file" id="user-skin-upload" accept="image/png">
+                </label>
+                <p id="file-name">ファイルが選択されていません</p>
+            </div>
+
+            <div id="preview-area" style="display: none;">
+                <h2>プレビュー</h2>
+                <canvas id="skin-canvas" width="64" height="64"></canvas>
+                <a id="download-button" class="download-button" href="#" download="mixed_skin.png">ダウンロード</a>
+            </div>
+
+            <div id="error-message" class="error"></div>
+        </div>
+
+        <div id="loading-message" style="display: none;">
+            <p>企画スキンを読み込んでいます...</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Powered by EasySkinMixer</p>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
