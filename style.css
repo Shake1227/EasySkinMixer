@@ -91,17 +91,16 @@ input[type="file"] {
 }
 
 .download-button {
-    display: block;
+    display: inline-block;
     background-color: #28a745;
     color: white;
     padding: 12px 24px;
-    margin: 1rem auto 0;
+    margin-top: 1rem;
     border-radius: 8px;
     text-decoration: none;
     font-weight: 700;
     font-size: 1rem;
     transition: background-color 0.3s;
-    width: fit-content;
 }
 
 .download-button:hover {
@@ -115,10 +114,8 @@ input[type="file"] {
 }
 
 footer {
-    position: fixed;
+    position: absolute;
     bottom: 10px;
-    width: 100%;
-    text-align: center;
     font-size: 0.8rem;
     color: #999;
 }
