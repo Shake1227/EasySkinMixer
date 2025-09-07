@@ -3,8 +3,8 @@
 
 const EVENTS = [
     {
-        id: 'casino', // 企画のID (URLに使われます。半角英数字で)
-        name: 'カジノ企画', // 企画名
+        id: 'casino_suit', // 企画のID (URLに使われます。半角英数字で)
+        name: 'カジノクラフト inメンシ「スーツ」', // 企画名
         logo: '', // 企画ロゴのURL (なければ空文字)
         skin: './skins/casino_suit.png' // 服装スキンのファイルパス
     },
