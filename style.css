@@ -75,12 +75,14 @@ input[type="file"] {
     margin-top: 2rem;
 }
 
-#skin-canvas {
-    width: 128px;  /* 64pxの2倍 */
-    height: 192px; /* 64pxの3倍 (上半身＋下半身をイメージ) */
+/* プレビュー用キャンバスのスタイル */
+#preview-canvas {
+    width: 160px;  /* キャラクターの幅 */
+    height: 320px; /* キャラクターの高さ */
     image-rendering: pixelated; /* ドット絵をくっきり表示 */
     border: 1px solid #ddd;
     border-radius: 4px;
+    background-color: #f7f7f7;
     background-image:
         linear-gradient(45deg, #eee 25%, transparent 25%),
         linear-gradient(-45deg, #eee 25%, transparent 25%),
