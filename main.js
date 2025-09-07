@@ -1,5 +1,5 @@
-// EasySkinMixer - Main Logic (バージョン3.1 - プレビュー表示修正版)
-console.log("EasySkinMixer: プレビュー表示を修正したバージョン3.1のスクリプトを読み込みました。");
+// EasySkinMixer - Main Logic (バージョン3.2 - プレビュー描画を直接実行)
+console.log("EasySkinMixer: プレビュー直接描画バージョン3.2のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
     // UI要素の取得
@@ -66,15 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 
-                // 1. スキンを合成する
+                // 1. スキンを合成し、ダウンロードリンクを更新する
                 mixSkins(userSkinImg, costumeImg);
 
-                // 2. 合成したスキンを新しい画像として読み込み、読み込み完了後にプレビューを描画する
-                const mixedSkinImage = new Image();
-                mixedSkinImage.onload = () => {
-                    drawPreview(mixedSkinImage); // 画像の読み込み完了後にプレビューを描画
-                };
-                mixedSkinImage.src = skinCanvas.toDataURL('image/png'); // 合成後のCanvasをソースに指定
+                // 2. 合成が行われたCanvasを、直接プレビュー描画関数に渡す
+                drawPreview(skinCanvas);
                 
                 previewArea.style.display = 'block';
             };
@@ -98,37 +94,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * 完成スキンからキャラクターのプレビューイラストを描画する関数
+     * 【修正】合成Canvasから直接キャラクターのプレビューイラストを描画する関数
      */
-    function drawPreview(skinImage) {
+    function drawPreview(sourceCanvas) { // 引数を画像からCanvasに変更
         const scale = 10;
         previewCanvas.width = 16 * scale;
         previewCanvas.height = 32 * scale;
         previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
 
+        // ドット絵がぼやけないように設定
+        previewCtx.imageSmoothingEnabled = false;
+
         const drawPart = (sx, sy, sw, sh, dx, dy, dw, dh, flip = false) => {
             previewCtx.save();
-            previewCtx.imageSmoothingEnabled = false; // アンチエイリアスを無効化してドット絵をくっきり
             if (flip) {
                 previewCtx.translate(previewCanvas.width, 0);
                 previewCtx.scale(-1, 1);
-                previewCtx.drawImage(skinImage, sx, sy, sw, sh, (16 - dx - dw) * scale, dy * scale, dw * scale, dh * scale);
+                previewCtx.drawImage(sourceCanvas, sx, sy, sw, sh, (16 - dx - dw) * scale, dy * scale, dw * scale, dh * scale);
             } else {
-                previewCtx.drawImage(skinImage, sx, sy, sw, sh, dx * scale, dy * scale, dw * scale, dh * scale);
+                previewCtx.drawImage(sourceCanvas, sx, sy, sw, sh, dx * scale, dy * scale, dw * scale, dh * scale);
             }
             previewCtx.restore();
         };
 
+        // 脚
         drawPart(4, 20, 4, 12, 4, 20, 4, 12);
         drawPart(4, 20, 4, 12, 8, 20, 4, 12, true);
         drawPart(4, 36, 4, 12, 4, 20, 4, 12);
         drawPart(4, 36, 4, 12, 8, 20, 4, 12, true);
+        // 腕
         drawPart(44, 20, 4, 12, 0, 8, 4, 12);
         drawPart(44, 20, 4, 12, 12, 8, 4, 12, true);
         drawPart(60, 20, 4, 12, 0, 8, 4, 12);
         drawPart(60, 20, 4, 12, 12, 8, 4, 12, true);
+        // 胴体
         drawPart(20, 20, 8, 12, 4, 8, 8, 12);
         drawPart(20, 36, 8, 12, 4, 8, 8, 12);
+        // 頭
         drawPart(8, 8, 8, 8, 4, 0, 8, 8);
         drawPart(40, 8, 8, 8, 4, 0, 8, 8);
     }
