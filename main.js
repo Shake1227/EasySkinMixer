@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /**
-     * スキンを合成する関数
+     * 【改良版】スキンを合成する関数
      * @param {HTMLImageElement} userSkin - ユーザーのスキン画像
      * @param {HTMLImageElement} costume - 企画の服装スキン画像
      */
