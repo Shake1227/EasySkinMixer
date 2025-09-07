@@ -8,12 +8,6 @@ const EVENTS = [
         logo: '', // 企画ロゴのURL (なければ空文字)
         skin: './skins/casino_suit.png' // 服装スキンのファイルパス
     },
-    {
-        id: 'summer_fes',
-        name: '夏祭り企画',
-        logo: './path/to/your/logo.png', // ロゴ画像のパスを指定
-        skin: './skins/yukata.png' // (例) 浴衣スキンのパス
-    },
     // --- 新しい企画を追加する場合は、この下にコピーして追記 ---
     // {
     //     id: 'new_event',
