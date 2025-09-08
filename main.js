@@ -1,6 +1,5 @@
 // ===== ローディング画面の制御 =====
 document.addEventListener('DOMContentLoaded', () => {
-    // (ローディング画面のコードは変更なし)
     const loadingScreen = document.getElementById('loading-screen');
     const percentEl = document.getElementById('progress-percent');
     const barEl = document.getElementById('progress-bar');
@@ -35,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== メインコンテンツの処理 =====
 function initializeMainContent() {
-    // (UI要素取得などのコードは変更なし)
     const containerEl = document.querySelector('.container');
     const eventNameEl = document.getElementById('event-name');
     const eventLogoEl = document.getElementById('event-logo');
@@ -59,11 +57,31 @@ function initializeMainContent() {
     const currentEvent = EVENTS.find(e => e.id === eventId);
     if (!currentEvent) { showError('指定された企画が見つかりませんでした。'); return; }
 
-    // ===== フォント適用処理を追加 =====
-    applyCustomFonts(currentEvent);
+    // ===== ここから修正: フォント関連の関数定義を先に移動 =====
+    const loadedFonts = new Set();
+    function loadGoogleFont(fontName) {
+        if (!fontName || loadedFonts.has(fontName)) return;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}&display=swap`;
+        document.head.appendChild(link);
+        loadedFonts.add(fontName);
+    }
+    function applyCustomFonts(event) {
+        if (event.titleFont) {
+            loadGoogleFont(event.titleFont);
+            eventNameEl.style.fontFamily = `'${event.titleFont}', sans-serif`;
+        }
+        if (event.descriptionFont) {
+            loadGoogleFont(event.descriptionFont);
+            descriptionEl.style.fontFamily = `'${event.descriptionFont}', sans-serif`;
+        }
+    }
+    // ===== ここまで修正 =====
+
+    applyCustomFonts(currentEvent); // フォント適用処理を呼び出し
 
     if (currentEvent.bgImage) {
-        // (背景画像処理は変更なし)
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
         containerEl.classList.add('bg-image-mode');
         uploadAreaEl.classList.add('bg-image-mode');
@@ -71,7 +89,6 @@ function initializeMainContent() {
         if (currentEvent.textColor) { containerEl.style.setProperty('--header-color', currentEvent.textColor); }
         else { containerEl.style.setProperty('--header-color', '#1a73e8'); }
     } else if (currentEvent.bgColor) {
-        // (背景色処理は変更なし)
         document.body.style.backgroundColor = currentEvent.bgColor;
         if (currentEvent.textColor) { updateContainerColor(currentEvent.bgColor, currentEvent.textColor); }
         else { updateContainerColor(currentEvent.bgColor); }
@@ -88,7 +105,6 @@ function initializeMainContent() {
     costumeImg.onerror = () => { showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。'); };
 
     uploader.addEventListener('change', (e) => {
-        // (ファイル選択時の処理は変更なし)
         const file = e.target.files[0];
         if (!file) return;
         fileNameEl.textContent = file.name;
@@ -122,28 +138,6 @@ function initializeMainContent() {
         reader.readAsDataURL(file);
     });
     
-    // ===== フォントを読み込み適用する関数を追加 =====
-    const loadedFonts = new Set(); // 読み込み済みのフォントを記録
-    function loadGoogleFont(fontName) {
-        if (!fontName || loadedFonts.has(fontName)) return;
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}&display=swap`;
-        document.head.appendChild(link);
-        loadedFonts.add(fontName);
-    }
-    function applyCustomFonts(event) {
-        if (event.titleFont) {
-            loadGoogleFont(event.titleFont);
-            eventNameEl.style.fontFamily = `'${event.titleFont}', sans-serif`;
-        }
-        if (event.descriptionFont) {
-            loadGoogleFont(event.descriptionFont);
-            descriptionEl.style.fontFamily = `'${event.descriptionFont}', sans-serif`;
-        }
-    }
-
-    // (以下の関数は変更なし)
     function updateContainerColor(hexColor, textColor) {
         const r = parseInt(hexColor.substr(1, 2), 16), g = parseInt(hexColor.substr(3, 2), 16), b = parseInt(hexColor.substr(5, 2), 16);
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
