@@ -76,15 +76,16 @@ footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-si
     transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
     display: flex;
     justify-content: center;
-    overflow: hidden; /* はみ出した要素を隠す */
+    overflow: hidden;
 }
 #loading-gate-top { 
     top: 0; 
-    align-items: flex-end; /* コンテンツを下揃えに */
+    align-items: flex-end;
 }
 #loading-gate-bottom { 
     bottom: 0; 
-    align-items: flex-start; /* コンテンツを上揃えに */
+    align-items: flex-start;
+    z-index: 1; /* この行を追加して最前面に表示 */
 }
 
 #loading-screen.gate-open #loading-gate-top { transform: translateY(-100%); }
@@ -96,7 +97,7 @@ footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-si
     width: 300px;
 }
 .loading-content.top { margin-bottom: 20px; }
-.loading-content.bottom { margin-top: -80px; /* この値を変更して位置を上に調整 */ }
+.loading-content.bottom { margin-top: -80px; }
 
 .progress-container { width: 100%; position: relative; }
 #progress-percent { display: block; font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; transition: opacity 0.3s ease; }
@@ -106,13 +107,13 @@ footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-si
 #loading-text {
     font-size: 3rem;
     font-weight: 700;
-    opacity: 0; /* 最初は非表示 */
+    opacity: 0;
     visibility: hidden;
 }
 
 /* アニメーション用のクラス */
 #loading-screen.loaded #progress-percent {
-    opacity: 0; /* 数字をフェードアウト */
+    opacity: 0;
 }
 #loading-screen.loaded #loading-text {
     visibility: visible;
