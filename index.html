@@ -5,18 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasySkinMixer</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
     <div id="lock-screen" style="display: none;">
         <div class="lock-container">
             <h2>認証が必要です</h2>
+            <div id="lock-icon-area">
+                <i id="lock-icon" class="fas fa-lock locked"></i>
+            </div>
             <p>暗号キーを入力してください</p>
-            <input type="text" id="key-input" placeholder="例: CS-XX-XX-XX-XX">
+            <input type="text" id="key-input" placeholder="例: CS-XXXX-XXXX-XXXX">
             <button id="unlock-button">認証</button>
             <p id="lock-error-message" class="error"></p>
         </div>
     </div>
+
+    <div id="white-fade-overlay" class="fade-overlay"></div>
+
     <div id="loading-screen" style="display: none;">
         <div id="loading-gate-top">
             <div class="loading-content top">
