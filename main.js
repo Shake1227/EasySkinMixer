@@ -3,49 +3,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingScreen = document.getElementById('loading-screen');
     const percentEl = document.getElementById('progress-percent');
     const barEl = document.getElementById('progress-bar');
-    const containerEl = document.querySelector('.container');
+    const loadingText = document.getElementById('loading-text'); // Loading!テキストを取得
+    const mainContainerEl = document.querySelector('.container'); // メインコンテンツのコンテナ
+
+    // mainContainerEl を最初から非表示にする（visibility: hidden;）
+    mainContainerEl.style.visibility = 'hidden';
 
     const loadingDuration = 5000; // 5秒
-    let progress = 0;
-    const intervalTime = 50; // 50msごとに更新
+    const startTime = Date.now();
 
-    const interval = setInterval(() => {
-        progress += (intervalTime / loadingDuration) * 100;
-        if (progress >= 100) {
-            progress = 100;
-            clearInterval(interval);
-            
-            percentEl.textContent = `${Math.floor(progress)}%`;
-            barEl.style.width = `${progress}%`;
+    // 緩急をつけるためのイージング関数
+    // 参考: https://easings.net/#easeInOutCubic
+    function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
 
+    function animateProgress() {
+        const elapsedTime = Date.now() - startTime;
+        let t = Math.min(1, elapsedTime / loadingDuration); // 0から1へ正規化された時間
+
+        let easedT = easeInOutCubic(t); // イージングを適用
+
+        let progress = easedT * 100;
+
+        percentEl.textContent = `${Math.floor(progress)}%`;
+        barEl.style.width = `${progress}%`;
+
+        if (t < 1) {
+            requestAnimationFrame(animateProgress);
+        } else {
             // 100%になったらアニメーションを開始
-            loadingScreen.classList.add('loaded');
+            percentEl.style.opacity = '0'; // 数字をフェードアウト
+            loadingText.style.visibility = 'visible';
+            loadingText.style.animation = 'drop-down 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards';
 
             // "Loading!"表示後、ゲートを開く
             setTimeout(() => {
                 loadingScreen.classList.add('gate-open');
-                containerEl.style.visibility = 'visible';
+                mainContainerEl.style.visibility = 'visible'; // メインコンテンツを表示
                 document.body.style.overflow = 'auto'; // スクロールを再度有効に
-            }, 1000); // 1秒後
+            }, 1000); // "Loading!"の落下アニメーション完了後
 
-            // ゲートが開き終わったらローディング画面を非表示に
+            // ゲートが開き終わったらローディング画面を完全に非表示に
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
-            }, 2000); // 1.8秒後
-
+            }, 1800); // ゲートのトランジション (0.8s) + 少し余裕
         }
-        percentEl.textContent = `${Math.floor(progress)}%`;
-        barEl.style.width = `${progress}%`;
-    }, intervalTime);
+    }
+    
+    // アニメーション開始
+    animateProgress();
 
-    // ===== 元の処理はここから =====
-    initializeMainContent(); 
+    // ===== 元のメインコンテンツ初期化処理 =====
+    initializeMainContent();
 });
 
 
-// ===== 元の処理を関数でラップ =====
+// ===== 元の処理を関数でラップ (変更なし) =====
 function initializeMainContent() {
-    // UI要素の取得
     const containerEl = document.querySelector('.container');
     const eventNameEl = document.getElementById('event-name');
     const eventLogoEl = document.getElementById('event-logo');
@@ -77,7 +92,6 @@ function initializeMainContent() {
         return;
     }
 
-    // ===== 背景設定のロジック =====
     if (currentEvent.bgImage) {
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
         containerEl.classList.add('bg-image-mode');
