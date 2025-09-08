@@ -31,6 +31,7 @@ body {
     max-width: 500px;
     text-align: center;
     transition: background-color 0.5s ease, color 0.5s ease, backdrop-filter 0.5s ease;
+    padding-bottom: 80px; /* フッターとの余白を確保 */
 }
 
 .container.bg-image-mode {
@@ -51,76 +52,77 @@ header { margin-bottom: 1.5rem; display: flex; flex-direction: column; align-ite
 .upload-button:hover { background-color: #155ab6; }
 input[type="file"] { display: none; }
 #file-name { margin-top: 1rem; font-size: 0.9rem; }
-#preview-area { margin-top: 2rem; }
-#preview-canvas { width: 160px; height: 320px; image-rendering: pixelated; border: 1px solid #ddd; border-radius: 4px; background-color: #f7f7f7; background-image: linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
-.download-button { display: block; background-color: #28a745; color: white; padding: 12px 24px; margin: 1rem auto 0; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 1rem; transition: background-color 0.3s; width: fit-content; }
+
+/* ===== プレビューエリアのアニメーションスタイルを追加 ===== */
+#preview-area {
+    margin-top: 2rem;
+    overflow: hidden; /* 中身がはみ出さないように */
+    max-height: 0; /* JSで高さを変更してアニメーションさせる */
+    opacity: 0;
+    transition: max-height 0.6s ease-out, opacity 0.4s ease-in;
+}
+#preview-area.visible {
+    max-height: 500px; /* 十分な高さを確保 */
+    opacity: 1;
+}
+
+#preview-canvas {
+    width: 160px;
+    height: 320px;
+    image-rendering: pixelated;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f7f7f7;
+    background-image: linear-gradient(45deg, #eee 25%, transparent 25%), linear-gradient(-45deg, #eee 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #eee 75%), linear-gradient(-45deg, transparent 75%, #eee 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    opacity: 0; /* 最初は非表示 */
+    transition: opacity 0.5s ease-in;
+}
+#preview-canvas.visible {
+    opacity: 1; /* フェードイン */
+}
+
+/* ===== ダウンロードボタンのアニメーションスタイルを追加 ===== */
+.download-button {
+    display: block;
+    background-color: #28a745;
+    color: white;
+    padding: 12px 24px;
+    margin: 1rem auto 0;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    width: fit-content;
+    opacity: 0; /* 最初は非表示 */
+    transform: translateY(20px); /* 少し下から */
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.download-button.visible {
+    opacity: 1;
+    transform: translateY(0); /* スライドイン */
+}
 .download-button:hover { background-color: #218838; }
+
 .error { color: #dc3545; margin-top: 1rem; font-weight: bold; }
 footer { position: fixed; bottom: 10px; width: 100%; text-align: center; font-size: 0.8rem; color: #999; }
 
-/* ===== ローディング画面のスタイルを修正 ===== */
-#loading-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    z-index: 9999;
-}
-#loading-gate-top, #loading-gate-bottom {
-    position: fixed;
-    left: 0;
-    width: 100%;
-    height: 50vh;
-    background-color: #fff;
-    transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-}
-#loading-gate-top { 
-    top: 0; 
-    align-items: flex-end;
-}
-#loading-gate-bottom { 
-    bottom: 0; 
-    align-items: flex-start;
-    z-index: 1; 
-}
-
+/* ===== ローディング画面のスタイル ===== */
+#loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 9999; }
+#loading-gate-top, #loading-gate-bottom { position: fixed; left: 0; width: 100%; height: 50vh; background-color: #fff; transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1); display: flex; justify-content: center; overflow: hidden; }
+#loading-gate-top { top: 0; align-items: flex-end; }
+#loading-gate-bottom { bottom: 0; align-items: flex-start; z-index: 1; }
 #loading-screen.gate-open #loading-gate-top { transform: translateY(-100%); }
 #loading-screen.gate-open #loading-gate-bottom { transform: translateY(100%); }
-
-.loading-content {
-    color: #888;
-    text-align: center;
-    width: 300px;
-}
+.loading-content { color: #888; text-align: center; width: 300px; }
 .loading-content.top { margin-bottom: 20px; }
-.loading-content.bottom { margin-top: -60px; /* この行を修正 */ }
-
+.loading-content.bottom { margin-top: -60px; }
 .progress-container { width: 100%; position: relative; }
 #progress-percent { display: block; font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; transition: opacity 0.3s ease; }
 .progress-bar-background { width: 100%; height: 10px; background-color: #e0e0e0; border-radius: 5px; overflow: hidden; }
 #progress-bar { width: 0%; height: 100%; background-color: #888; border-radius: 5px; }
-
-#loading-text {
-    font-size: 3rem;
-    font-weight: 700;
-    opacity: 0;
-    visibility: hidden;
-}
-
-/* アニメーション用のクラス */
-#loading-screen.loaded #progress-percent {
-    opacity: 0;
-}
-#loading-screen.loaded #loading-text {
-    visibility: visible;
-    animation: drop-down 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
-}
-
-@keyframes drop-down {
-    0% { transform: translateY(-100%); opacity: 0; }
-    100% { transform: translateY(0); opacity: 1; }
-}
+#loading-text { font-size: 3rem; font-weight: 700; opacity: 0; visibility: hidden; }
+#loading-screen.loaded #progress-percent { opacity: 0; }
+#loading-screen.loaded #loading-text { visibility: visible; animation: drop-down 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+@keyframes drop-down { 0% { transform: translateY(-100%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
