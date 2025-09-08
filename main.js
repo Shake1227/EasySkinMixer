@@ -1,4 +1,3 @@
-// ===== ページの読み込み時の処理 =====
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get('event');
@@ -13,10 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // メインコンテンツの初期化を先に実行
     initializeMainContent(currentEvent);
 
-    // ロック機能のチェック
     if (currentEvent.lock === true) {
         if (getCookie(`unlocked-${eventId}`) === 'true') {
             startLoadingAnimation();
@@ -28,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// ===== ロック画面の制御 (プロダクトキー方式 & アニメーション) =====
 function showLockScreen(event) {
     const lockScreen = document.getElementById('lock-screen');
     const keyInput = document.getElementById('key-input');
@@ -38,7 +34,7 @@ function showLockScreen(event) {
     const whiteFadeOverlay = document.getElementById('white-fade-overlay');
 
     lockScreen.style.display = 'flex';
-    setTimeout(() => lockScreen.classList.add('visible'), 10); // フェードイン
+    setTimeout(() => lockScreen.classList.add('visible'), 10);
 
     unlockButton.onclick = async () => {
         const inputKey = keyInput.value.trim().toUpperCase();
@@ -47,25 +43,20 @@ function showLockScreen(event) {
             keyInput.disabled = true;
             unlockButton.disabled = true;
 
-            // 1. 南京錠解除アニメーション
             lockIcon.classList.remove('fa-lock');
             lockIcon.classList.add('fa-lock-open');
             
-            await new Promise(resolve => setTimeout(resolve, 600)); // アニメーション待機
+            await new Promise(resolve => setTimeout(resolve, 600)); 
 
-            // 2. 白い画面へフェードイン
             whiteFadeOverlay.classList.add('visible');
-            await new Promise(resolve => setTimeout(resolve, 600)); // フェードイン待機
+            await new Promise(resolve => setTimeout(resolve, 600));
 
-            // 3. ロック画面を非表示に
             lockScreen.classList.remove('visible');
             setTimeout(() => lockScreen.style.display = 'none', 500);
 
-            // 4. Cookie保存 & ローディング開始
             setCookie(`unlocked-${event.id}`, 'true', 365);
             startLoadingAnimation();
             
-            // 5. 白い画面をフェードアウト
             setTimeout(() => whiteFadeOverlay.classList.remove('visible'), 500);
 
         } else {
@@ -74,7 +65,6 @@ function showLockScreen(event) {
     };
 }
 
-// (以下、前回のコードから変更なし)
 function validateProductKey(key, eventId, secret) {
     if (!key || !eventId || !secret) return false;
     const parts = key.split('-');
