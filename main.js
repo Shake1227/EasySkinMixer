@@ -1,7 +1,50 @@
-// EasySkinMixer - Main Logic
-console.log("EasySkinMixer: プレビューのスクリプトを読み込みました。");
-
+// ===== ローディング画面の制御を追加 =====
 document.addEventListener('DOMContentLoaded', () => {
+    const loadingScreen = document.getElementById('loading-screen');
+    const percentEl = document.getElementById('progress-percent');
+    const barEl = document.getElementById('progress-bar');
+    const containerEl = document.querySelector('.container');
+
+    const loadingDuration = 5000; // 5秒
+    let progress = 0;
+    const intervalTime = 50; // 50msごとに更新
+
+    const interval = setInterval(() => {
+        progress += (intervalTime / loadingDuration) * 100;
+        if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            
+            percentEl.textContent = `${Math.floor(progress)}%`;
+            barEl.style.width = `${progress}%`;
+
+            // 100%になったらアニメーションを開始
+            loadingScreen.classList.add('loaded');
+
+            // "Loading!"表示後、ゲートを開く
+            setTimeout(() => {
+                loadingScreen.classList.add('gate-open');
+                containerEl.style.visibility = 'visible';
+                document.body.style.overflow = 'auto'; // スクロールを再度有効に
+            }, 1000); // 1秒後
+
+            // ゲートが開き終わったらローディング画面を非表示に
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 2000); // 1.8秒後
+
+        }
+        percentEl.textContent = `${Math.floor(progress)}%`;
+        barEl.style.width = `${progress}%`;
+    }, intervalTime);
+
+    // ===== 元の処理はここから =====
+    initializeMainContent(); 
+});
+
+
+// ===== 元の処理を関数でラップ =====
+function initializeMainContent() {
     // UI要素の取得
     const containerEl = document.querySelector('.container');
     const eventNameEl = document.getElementById('event-name');
@@ -34,36 +77,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // ===== ここから背景設定のロジック =====
-    // 1. 背景画像が指定されている場合 (bgImageを優先)
+    // ===== 背景設定のロジック =====
     if (currentEvent.bgImage) {
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
         containerEl.classList.add('bg-image-mode');
         uploadAreaEl.classList.add('bg-image-mode');
-
-        // 背景画像の場合、タイトル以外の文字色は黒に固定
         containerEl.style.setProperty('--text-color', '#333'); 
-        
-        // タイトルのみconfig.jsで指定された色を使用
         if (currentEvent.textColor) {
             containerEl.style.setProperty('--header-color', currentEvent.textColor);
         } else {
-            // textColorが指定されていない場合は、デフォルトの青を使用
             containerEl.style.setProperty('--header-color', '#1a73e8'); 
         }
-
     }
-    // 2. 背景色が指定されている場合
     else if (currentEvent.bgColor) {
         document.body.style.backgroundColor = currentEvent.bgColor;
-        // textColorの指定があればそれを使い、なければ自動調整する
         if (currentEvent.textColor) {
             updateContainerColor(currentEvent.bgColor, currentEvent.textColor);
         } else {
             updateContainerColor(currentEvent.bgColor);
         }
     }
-    // ===== 背景設定のロジックここまで =====
 
     eventNameEl.textContent = currentEvent.name;
     descriptionEl.textContent = `あなたのスキンをアップロードして、「${currentEvent.name}」限定スキンと合成しよう！`;
@@ -108,32 +141,19 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(file);
     });
 
-    /**
-     * 背景色に合わせてコンテナの配色を更新する関数
-     * @param {string} hexColor - #RRGGBB形式のカラーコード
-     * @param {string} [textColor] - (任意) #RRGGBB形式の文字色
-     */
     function updateContainerColor(hexColor, textColor) {
         const r = parseInt(hexColor.substr(1, 2), 16);
         const g = parseInt(hexColor.substr(3, 2), 16);
         const b = parseInt(hexColor.substr(5, 2), 16);
-
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-
-        // textColorが指定されていればそれを使い、なければ自動判定
         const finalTextColor = textColor ? textColor : (yiq >= 128 ? '#333' : '#f8f9fa');
-
-        // ヘッダーの色も同じ色に設定
         containerEl.style.setProperty('--header-color', finalTextColor);
-
         if (yiq >= 128) {
-            // 明るい背景
             containerEl.style.setProperty('--container-bg', 'rgba(0, 0, 0, 0.05)');
             containerEl.style.setProperty('--text-color', finalTextColor);
             containerEl.style.setProperty('--upload-area-bg', 'rgba(0, 0, 0, 0.03)');
             containerEl.style.setProperty('--upload-area-border', 'rgba(0, 0, 0, 0.2)');
         } else {
-            // 暗い背景
             containerEl.style.setProperty('--container-bg', 'rgba(255, 255, 255, 0.1)');
             containerEl.style.setProperty('--text-color', finalTextColor);
             containerEl.style.setProperty('--upload-area-bg', 'rgba(255, 255, 255, 0.05)');
@@ -146,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
         skinCtx.drawImage(costume, 0, 0);
         skinCtx.clearRect(0, 0, 64, 16);
         skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
-
         const mixedSkinUrl = skinCanvas.toDataURL('image/png');
         downloadButton.href = mixedSkinUrl;
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
@@ -158,21 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
         previewCanvas.height = 32 * scale;
         previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
         previewCtx.imageSmoothingEnabled = false;
-
         const drawPart = (sx, sy, sw, sh, dx, dy) => {
             previewCtx.drawImage(sourceCanvas, sx, sy, sw, sh, dx * scale, dy * scale, sw * scale, sh * scale);
         };
-
-        drawPart(4, 20, 4, 12, 8, 20);  // 右脚
-        drawPart(44, 20, 4, 12, 12, 8); // 右腕
-        drawPart(20, 20, 8, 12, 4, 8);  // 胴体
-        drawPart(20, 36, 8, 12, 4, 8);  // 胴体上着
-        drawPart(4, 20, 4, 12, 4, 20);  // 左脚
-        drawPart(4, 36, 4, 12, 4, 20);  // 左脚上着
-        drawPart(44, 20, 4, 12, 0, 8);  // 左腕
-        drawPart(60, 20, 4, 12, 0, 8);  // 左腕上着
-        drawPart(8, 8, 8, 8, 4, 0);    // 頭
-        drawPart(40, 8, 8, 8, 4, 0);   // 頭上着
+        drawPart(4, 20, 4, 12, 8, 20);
+        drawPart(44, 20, 4, 12, 12, 8);
+        drawPart(20, 20, 8, 12, 4, 8);
+        drawPart(20, 36, 8, 12, 4, 8);
+        drawPart(4, 20, 4, 12, 4, 20);
+        drawPart(4, 36, 4, 12, 4, 20);
+        drawPart(44, 20, 4, 12, 0, 8);
+        drawPart(60, 20, 4, 12, 0, 8);
+        drawPart(8, 8, 8, 8, 4, 0);
+        drawPart(40, 8, 8, 8, 4, 0);
     }
 
     function showError(message) {
@@ -180,4 +197,4 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingMessageEl.style.display = 'none';
         errorMessageEl.textContent = message;
     }
-});
+}
