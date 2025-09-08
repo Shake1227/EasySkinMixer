@@ -7,7 +7,7 @@ const EVENTS = [
         name: 'inメンシ「スーツ」', // 企画名
         logo: 'http://www.floral-village.info/up/1757264384.png', // 企画ロゴのURL (なければ空文字)
         skin: './skins/casino_suit.png', // 服装スキンのファイルパス
-        bgColor: '#2c3e50', // 背景色を指定する※背景画像がある場合は不要
+        bgColor: '#2c3e50' // 背景色を指定する※背景画像がある場合は不要
         // bgImage: 'https://example.com/path/to/your/image.jpg' // 背景画像を指定
         // textColor: '#FFFFFF' // 背景画像を指定した際の、文字の色
     },
