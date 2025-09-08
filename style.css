@@ -157,7 +157,7 @@ footer {
 }
 
 
-/* ===== ローディング画面のスタイルを追加・修正 ===== */
+/* ===== ローディング画面のスタイルを修正 ===== */
 #loading-screen {
     position: fixed;
     top: 0;
@@ -165,53 +165,39 @@ footer {
     width: 100%;
     height: 100vh;
     z-index: 9999;
-    /* justify-contentとalign-itemsは子要素に移す */
-    display: flex; /* Flexboxを維持 */
-    flex-direction: column; /* ゲートが上下に並ぶように */
     background-color: transparent;
 }
 #loading-gate-top, #loading-gate-bottom {
-    position: relative; /* 子要素の位置基準のため */
+    position: fixed;
+    left: 0;
     width: 100%;
     height: 50vh;
     background-color: #fff;
     transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
-    display: flex; /* 子要素を中央に配置するために追加 */
-    justify-content: center; /* 子要素を水平中央 */
-    overflow: hidden; /* Gateが開いたときにコンテンツがはみ出さないように */
+    display: flex;
+    justify-content: center;
 }
 #loading-gate-top { 
     top: 0; 
-    align-items: flex-end; /* loading-contentを下揃え */
-    padding-bottom: 20px; /* 少しスペースを空ける */
+    align-items: flex-end; /* コンテンツを下揃えに */
 }
 #loading-gate-bottom { 
     bottom: 0; 
-    align-items: flex-start; /* loading-contentを上揃え */
-    padding-top: 20px; /* 少しスペースを空ける */
 }
 
 #loading-screen.gate-open #loading-gate-top { transform: translateY(-100%); }
 #loading-screen.gate-open #loading-gate-bottom { transform: translateY(100%); }
 
-
 .loading-content {
     color: #888;
     text-align: center;
-    position: absolute; /* ゲート内での配置を調整 */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%; /* 親要素の幅に合わせて中央配置 */
-    max-width: 300px; /* progress-containerに合わせて */
+    width: 300px;
+    margin-bottom: 40px; /* 画面中央に近づけるための調整 */
 }
 
 .progress-container {
-    width: 100%; /* 親要素の幅を継承 */
+    width: 100%;
     position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 #progress-percent {
@@ -235,7 +221,7 @@ footer {
     height: 100%;
     background-color: #888;
     border-radius: 5px;
-    /* widthのtransitionはJSで制御するため削除 */
+    /* カクつきの原因になるため transition は削除 */
 }
 
 #loading-text {
@@ -243,19 +229,15 @@ footer {
     font-weight: 700;
     position: absolute;
     width: 100%;
-    top: 50%; /* ゲージの中央に配置 */
+    top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* 自身のサイズを考慮して中央揃え */
+    transform: translate(-50%, -50%);
     opacity: 0;
     visibility: hidden;
-    white-space: nowrap; /* "Loading!"が改行されないように */
+    white-space: nowrap;
 }
 
 /* ===== アニメーション定義 ===== */
-#loading-screen.loaded #progress-percent {
-    opacity: 0;
-}
-
 #loading-screen.loaded #loading-text {
     visibility: visible;
     animation: drop-down 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
@@ -263,11 +245,11 @@ footer {
 
 @keyframes drop-down {
     0% {
-        transform: translate(-50%, -150%); /* 初期位置をより上に */
+        transform: translate(-50%, -150%);
         opacity: 0;
     }
     100% {
-        transform: translate(-50%, -10px); /* ゲージの真ん中より少し上に着地 */
+        transform: translate(-50%, -10px);
         opacity: 1;
     }
 }
