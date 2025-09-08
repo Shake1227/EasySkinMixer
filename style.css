@@ -13,6 +13,8 @@ body {
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
+    /* 読み込み完了までスクロールを無効化 */
+    overflow: hidden;
 }
 
 .container {
@@ -36,12 +38,12 @@ body {
 
 /* ===== 背景画像が設定された時のスタイル ===== */
 .container.bg-image-mode {
-    background-color: rgba(255, 255, 255, 0.7); /* 透明度を85%から70%に変更 */
+    background-color: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
 .upload-area.bg-image-mode {
-    background-color: rgba(255, 255, 255, 0.5) !important; /* 透明度を60%から50%に変更 */
+    background-color: rgba(255, 255, 255, 0.5) !important;
     border-color: rgba(255, 255, 255, 0.7) !important;
 }
 /* ===== =============================== ===== */
@@ -73,7 +75,7 @@ header {
     border: 2px dashed var(--upload-area-border);
     border-radius: 8px;
     background-color: var(--upload-area-bg);
-    transition: background-color 0.5s ease, border-color 0.5s ease; /* transitionを追加 */
+    transition: background-color 0.5s ease, border-color 0.5s ease;
 }
 
 .upload-button {
@@ -98,7 +100,6 @@ input[type="file"] {
 
 #file-name {
     margin-top: 1rem;
-    /* 色は .container の color を継承する */
     font-size: 0.9rem;
 }
 
@@ -153,4 +154,99 @@ footer {
     text-align: center;
     font-size: 0.8rem;
     color: #999;
+}
+
+
+/* ===== ローディング画面のスタイルを追加 ===== */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent; /* ゲートが開くので背景は不要 */
+}
+#loading-gate-top, #loading-gate-bottom {
+    position: fixed;
+    left: 0;
+    width: 100%;
+    height: 50vh;
+    background-color: #fff;
+    transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+}
+#loading-gate-top { top: 0; }
+#loading-gate-bottom { bottom: 0; }
+
+#loading-screen.gate-open #loading-gate-top { transform: translateY(-100%); }
+#loading-screen.gate-open #loading-gate-bottom { transform: translateY(100%); }
+
+.loading-content {
+    color: #888;
+    text-align: center;
+}
+
+.progress-container {
+    width: 300px;
+    position: relative;
+}
+
+#progress-percent {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    transition: opacity 0.5s ease;
+}
+
+.progress-bar-background {
+    width: 100%;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #888;
+    border-radius: 5px;
+    transition: width 0.1s linear; /* なめらかにゲージが伸びるように */
+}
+
+#loading-text {
+    font-size: 3rem;
+    font-weight: 700;
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* ===== アニメーション定義 ===== */
+#loading-screen.loaded #progress-percent {
+    opacity: 0;
+}
+
+#loading-screen.loaded #loading-text {
+    visibility: visible;
+    animation: drop-down 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+@keyframes drop-down {
+    0% {
+        transform: translate(-50%, -150%);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -10px); /* ゲージの真ん中より少し上に着地 */
+        opacity: 1;
+    }
 }
