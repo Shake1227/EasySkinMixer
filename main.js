@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const eventLogoEl = document.getElementById('event-logo');
     const descriptionEl = document.getElementById('description');
     const uploader = document.getElementById('user-skin-upload');
+    const uploadAreaEl = document.querySelector('.upload-area'); // upload-areaを取得
     const fileNameEl = document.getElementById('file-name');
     const previewArea = document.getElementById('preview-area');
     const skinCanvas = document.getElementById('skin-canvas');
@@ -38,6 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentEvent.bgImage) {
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
         containerEl.classList.add('bg-image-mode');
+        uploadAreaEl.classList.add('bg-image-mode'); // upload-areaにもクラスを付与
+        if (currentEvent.textColor) {
+            containerEl.style.color = currentEvent.textColor;
+        }
     }
     // 2. 背景色が指定されている場合
     else if (currentEvent.bgColor) {
@@ -100,12 +105,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
 
+        // CSS変数を使って色を動的に設定
         if (yiq >= 128) {
-            containerEl.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
-            containerEl.style.color = '#333';
+            // 明るい背景
+            containerEl.style.setProperty('--container-bg', 'rgba(0, 0, 0, 0.05)');
+            containerEl.style.setProperty('--text-color', '#333');
+            containerEl.style.setProperty('--upload-area-bg', 'rgba(0, 0, 0, 0.03)');
+            containerEl.style.setProperty('--upload-area-border', 'rgba(0, 0, 0, 0.2)');
         } else {
-            containerEl.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-            containerEl.style.color = '#f8f9fa';
+            // 暗い背景
+            containerEl.style.setProperty('--container-bg', 'rgba(255, 255, 255, 0.1)');
+            containerEl.style.setProperty('--text-color', '#f8f9fa');
+            containerEl.style.setProperty('--upload-area-bg', 'rgba(255, 255, 255, 0.05)');
+            containerEl.style.setProperty('--upload-area-border', 'rgba(255, 255, 255, 0.2)');
         }
     }
 
