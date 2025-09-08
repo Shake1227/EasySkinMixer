@@ -3,13 +3,14 @@ console.log("EasySkinMixer: プレビューのスクリプトを読み込みま�
 
 document.addEventListener('DOMContentLoaded', () => {
     // UI要素の取得
+    const containerEl = document.querySelector('.container');
     const eventNameEl = document.getElementById('event-name');
     const eventLogoEl = document.getElementById('event-logo');
     const descriptionEl = document.getElementById('description');
     const uploader = document.getElementById('user-skin-upload');
     const fileNameEl = document.getElementById('file-name');
     const previewArea = document.getElementById('preview-area');
-    const skinCanvas = document.getElementById('skin-canvas'); 
+    const skinCanvas = document.getElementById('skin-canvas');
     const previewCanvas = document.getElementById('preview-canvas');
     const downloadButton = document.getElementById('download-button');
     const errorMessageEl = document.getElementById('error-message');
@@ -32,6 +33,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // ===== ここから背景設定のロジック =====
+    // 1. 背景画像が指定されている場合 (bgImageを優先)
+    if (currentEvent.bgImage) {
+        document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
+        containerEl.classList.add('bg-image-mode');
+    }
+    // 2. 背景色が指定されている場合
+    else if (currentEvent.bgColor) {
+        document.body.style.backgroundColor = currentEvent.bgColor;
+        updateContainerColor(currentEvent.bgColor);
+    }
+    // ===== 背景設定のロジックここまで =====
+
     eventNameEl.textContent = currentEvent.name;
     descriptionEl.textContent = `あなたのスキンをアップロードして、「${currentEvent.name}」限定スキンと合成しよう！`;
     if (currentEvent.logo) {
@@ -42,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const costumeImg = new Image();
     costumeImg.crossOrigin = "anonymous";
     costumeImg.src = currentEvent.skin;
-    
+
     costumeImg.onload = () => {
         loadingMessageEl.style.display = 'none';
         mixerUiEl.style.display = 'block';
@@ -65,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewArea.style.display = 'none';
                     return;
                 }
-                
+
                 mixSkins(userSkinImg, costumeImg);
                 drawPreview(skinCanvas);
                 previewArea.style.display = 'block';
@@ -75,12 +89,32 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(file);
     });
 
+    /**
+     * 背景色に合わせてコンテナの配色を更新する関数
+     * @param {string} hexColor - #RRGGBB形式のカラーコード
+     */
+    function updateContainerColor(hexColor) {
+        const r = parseInt(hexColor.substr(1, 2), 16);
+        const g = parseInt(hexColor.substr(3, 2), 16);
+        const b = parseInt(hexColor.substr(5, 2), 16);
+
+        const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+
+        if (yiq >= 128) {
+            containerEl.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
+            containerEl.style.color = '#333';
+        } else {
+            containerEl.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+            containerEl.style.color = '#f8f9fa';
+        }
+    }
+
     function mixSkins(userSkin, costume) {
         skinCtx.clearRect(0, 0, 64, 64);
         skinCtx.drawImage(costume, 0, 0);
         skinCtx.clearRect(0, 0, 64, 16);
         skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
-        
+
         const mixedSkinUrl = skinCanvas.toDataURL('image/png');
         downloadButton.href = mixedSkinUrl;
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
@@ -99,15 +133,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         drawPart(4, 20, 4, 12, 8, 20);  // 右脚
         drawPart(44, 20, 4, 12, 12, 8); // 右腕
-        
         drawPart(20, 20, 8, 12, 4, 8);  // 胴体
         drawPart(20, 36, 8, 12, 4, 8);  // 胴体上着
-
         drawPart(4, 20, 4, 12, 4, 20);  // 左脚
         drawPart(4, 36, 4, 12, 4, 20);  // 左脚上着
         drawPart(44, 20, 4, 12, 0, 8);  // 左腕
         drawPart(60, 20, 4, 12, 0, 8);  // 左腕上着
-
         drawPart(8, 8, 8, 8, 4, 0);    // 頭
         drawPart(40, 8, 8, 8, 4, 0);   // 頭上着
     }
