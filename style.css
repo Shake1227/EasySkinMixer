@@ -50,4 +50,224 @@ body {
 
 header {
     margin-bottom: 1.5rem;
-    display: flex
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#event-name {
+    font-size: 2rem;
+    color: var(--header-color); /* 青色固定をやめ、変数を使用 */
+    margin-top: 15px;
+    white-space: nowrap;
+}
+
+#event-logo {
+    max-width: 300px;
+    max-height: 150px;
+    background-color: white;
+    border-radius: 8px;
+}
+
+.upload-area {
+    margin: 1.5rem 0;
+    padding: 2rem;
+    border: 2px dashed var(--upload-area-border);
+    border-radius: 8px;
+    background-color: var(--upload-area-bg);
+    transition: background-color 0.5s ease, border-color 0.5s ease;
+}
+
+.upload-button {
+    background-color: #1a73e8;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    transition: background-color 0.3s;
+    display: inline-block;
+}
+
+.upload-button:hover {
+    background-color: #155ab6;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+#file-name {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+#preview-area {
+    margin-top: 2rem;
+}
+
+#preview-canvas {
+    width: 160px;
+    height: 320px;
+    image-rendering: pixelated;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f7f7f7;
+    background-image:
+        linear-gradient(45deg, #eee 25%, transparent 25%),
+        linear-gradient(-45deg, #eee 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #eee 75%),
+        linear-gradient(-45deg, transparent 75%, #eee 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.download-button {
+    display: block;
+    background-color: #28a745;
+    color: white;
+    padding: 12px 24px;
+    margin: 1rem auto 0;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    width: fit-content;
+}
+
+.download-button:hover {
+    background-color: #218838;
+}
+
+.error {
+    color: #dc3545;
+    margin-top: 1rem;
+    font-weight: bold;
+}
+
+footer {
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #999;
+}
+
+
+/* ===== ローディング画面のスタイルを追加・修正 ===== */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 9999;
+    /* justify-contentとalign-itemsは子要素に移す */
+    display: flex; /* Flexboxを維持 */
+    flex-direction: column; /* ゲートが上下に並ぶように */
+    background-color: transparent;
+}
+#loading-gate-top, #loading-gate-bottom {
+    position: relative; /* 子要素の位置基準のため */
+    width: 100%;
+    height: 50vh;
+    background-color: #fff;
+    transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+    display: flex; /* 子要素を中央に配置するために追加 */
+    justify-content: center; /* 子要素を水平中央 */
+    overflow: hidden; /* Gateが開いたときにコンテンツがはみ出さないように */
+}
+#loading-gate-top { 
+    top: 0; 
+    align-items: flex-end; /* loading-contentを下揃え */
+    padding-bottom: 20px; /* 少しスペースを空ける */
+}
+#loading-gate-bottom { 
+    bottom: 0; 
+    align-items: flex-start; /* loading-contentを上揃え */
+    padding-top: 20px; /* 少しスペースを空ける */
+}
+
+#loading-screen.gate-open #loading-gate-top { transform: translateY(-100%); }
+#loading-screen.gate-open #loading-gate-bottom { transform: translateY(100%); }
+
+
+.loading-content {
+    color: #888;
+    text-align: center;
+    position: absolute; /* ゲート内での配置を調整 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%; /* 親要素の幅に合わせて中央配置 */
+    max-width: 300px; /* progress-containerに合わせて */
+}
+
+.progress-container {
+    width: 100%; /* 親要素の幅を継承 */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#progress-percent {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    transition: opacity 0.5s ease;
+}
+
+.progress-bar-background {
+    width: 100%;
+    height: 10px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#progress-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #888;
+    border-radius: 5px;
+    /* widthのtransitionはJSで制御するため削除 */
+}
+
+#loading-text {
+    font-size: 3rem;
+    font-weight: 700;
+    position: absolute;
+    width: 100%;
+    top: 50%; /* ゲージの中央に配置 */
+    left: 50%;
+    transform: translate(-50%, -50%); /* 自身のサイズを考慮して中央揃え */
+    opacity: 0;
+    visibility: hidden;
+    white-space: nowrap; /* "Loading!"が改行されないように */
+}
+
+/* ===== アニメーション定義 ===== */
+#loading-screen.loaded #progress-percent {
+    opacity: 0;
+}
+
+#loading-screen.loaded #loading-text {
+    visibility: visible;
+    animation: drop-down 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+@keyframes drop-down {
+    0% {
+        transform: translate(-50%, -150%); /* 初期位置をより上に */
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-50%, -10px); /* ゲージの真ん中より少し上に着地 */
+        opacity: 1;
+    }
+}
