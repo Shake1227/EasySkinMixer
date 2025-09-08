@@ -18,15 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
         else { percentEl.textContent = '100%'; barEl.style.width = '100%'; finishLoadingAnimation(); }
     }
     function finishLoadingAnimation() {
+        // ===== アニメーションの「間」を長くする =====
         setTimeout(() => {
-            loadingScreen.classList.add('loaded');
+            loadingScreen.classList.add('loaded'); // 数字が消え、Loading!が表示
             setTimeout(() => {
-                loadingScreen.classList.add('gate-open');
+                loadingScreen.classList.add('gate-open'); // ゲートが開く
                 containerEl.style.visibility = 'visible';
                 document.body.style.overflow = 'auto';
-            }, 800);
-            setTimeout(() => { loadingScreen.style.display = 'none'; }, 1800);
-        }, 100);
+            }, 1200); // 1.2秒後 (延長)
+            setTimeout(() => { loadingScreen.style.display = 'none'; }, 2200); // 2.2秒後 (延長)
+        }, 400); // 0.4秒後 (延長)
     }
     requestAnimationFrame(updateProgress);
     initializeMainContent();
@@ -87,7 +88,6 @@ function initializeMainContent() {
         fileNameEl.textContent = file.name;
         errorMessageEl.textContent = '';
 
-        // アニメーションをリセット
         previewArea.classList.remove('visible');
         previewCanvas.classList.remove('visible');
         downloadButton.classList.remove('visible');
@@ -105,28 +105,27 @@ function initializeMainContent() {
                 mixSkins(userSkinImg, costumeImg);
                 drawPreview(skinCanvas);
 
-                // ===== ここからアニメーションの連鎖 =====
+                // ===== アニメーションのタイミングを全体的に遅くする =====
                 previewArea.style.display = 'block';
                 
-                // 1. スクロール
-                setTimeout(() => {
-                    previewArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 100);
-
-                // 2. プレビューエリアを伸ばす
+                // 1. プレビューエリアを伸ばす
                 setTimeout(() => {
                     previewArea.classList.add('visible');
-                }, 300);
+                    // 伸ばし終わったタイミングでスクロール
+                    setTimeout(() => {
+                        previewArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 800); // 0.8秒後
+                }, 100);
 
-                // 3. プレビュー画像をフェードイン
+                // 2. プレビュー画像をフェードイン
                 setTimeout(() => {
                     previewCanvas.classList.add('visible');
-                }, 700);
+                }, 1200); // 1.2秒後 (延長)
 
-                // 4. ダウンロードボタンをスライドイン
+                // 3. ダウンロードボタンをスライドイン
                 setTimeout(() => {
                     downloadButton.classList.add('visible');
-                }, 1000);
+                }, 1600); // 1.6秒後 (延長)
 
             };
             userSkinImg.src = event.target.result;
