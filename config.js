@@ -7,10 +7,10 @@ const EVENTS = [
         name: 'inメンシ「スーツ」', // 企画名
         logo: 'http://www.floral-village.info/up/1757264384.png', // 企画ロゴのURL (なければ空文字)
         skin: './skins/casino_suit.png', // 服装スキンのファイルパス
-        bgColor: '#2c3e50',
-        textColor: '#FFFFFF',
-        titleFont: 'Kiwi Maru', // タイトル用のフォント
-        descriptionFont: 'Yusei Magic', // 説明文用のフォント
+        bgImage: 'https://example.com/image.jpg',
+        textColor: '#000000',
+        titleFont: 'Kaisei Tokumin', // タイトル用のフォント
+        descriptionFont: 'Kaisei HarunoUmi', // 説明文用のフォント
     },
     // --- 新しい企画を追加する場合は、この下にコピーして追記 ---
     // {
@@ -19,6 +19,7 @@ const EVENTS = [
     //     logo: '',
     //     skin: './skins/new_skin.png',
     //     bgImage: 'https://example.com/image.jpg',
+    //     bgColor: '#000000',
     //     textColor: '#333',
     //     titleFont: 'DotGothic16',
     //     descriptionFont: 'Kaisei Opti',
