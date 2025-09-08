@@ -36,12 +36,12 @@ body {
 
 /* ===== 背景画像が設定された時のスタイル ===== */
 .container.bg-image-mode {
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: rgba(255, 255, 255, 0.7); /* 透明度を85%から70%に変更 */
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
 .upload-area.bg-image-mode {
-    background-color: rgba(255, 255, 255, 0.6) !important; /* 少し濃いめの半透明 */
+    background-color: rgba(255, 255, 255, 0.5) !important; /* 透明度を60%から50%に変更 */
     border-color: rgba(255, 255, 255, 0.7) !important;
 }
 /* ===== =============================== ===== */
