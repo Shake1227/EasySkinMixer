@@ -13,22 +13,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // メインコンテンツの初期化を先に実行
+    initializeMainContent(currentEvent);
+
+    // ロック機能のチェック
     if (currentEvent.lock === true) {
         if (getCookie(`unlocked-${eventId}`) === 'true') {
             startLoadingAnimation();
         } else {
-            // ロック画面を表示する前に、フェードオーバーレイとローディング画面を非表示に
-            document.getElementById('white-fade-overlay').style.opacity = '0';
-            document.getElementById('white-fade-overlay').style.visibility = 'hidden';
-            document.getElementById('loading-screen').style.display = 'none';
-            
             showLockScreen(currentEvent);
         }
     } else {
         startLoadingAnimation();
     }
-
-    initializeMainContent(currentEvent);
 });
 
 // ===== ロック画面の制御 (プロダクトキー方式 & アニメーション) =====
@@ -41,53 +38,48 @@ function showLockScreen(event) {
     const whiteFadeOverlay = document.getElementById('white-fade-overlay');
 
     lockScreen.style.display = 'flex';
-    lockScreen.classList.add('active'); // フェードイン用
-    lockIcon.className = 'fas fa-lock locked'; // 初期状態をロックに設定
+    setTimeout(() => lockScreen.classList.add('visible'), 10); // フェードイン
 
     unlockButton.onclick = async () => {
         const inputKey = keyInput.value.trim().toUpperCase();
         if (validateProductKey(inputKey, event.id, event.lockSecret)) {
-            errorMessage.textContent = ''; // エラーメッセージをクリア
-            keyInput.disabled = true; // キー入力とボタンを無効化
+            errorMessage.textContent = '';
+            keyInput.disabled = true;
             unlockButton.disabled = true;
 
             // 1. 南京錠解除アニメーション
-            lockIcon.classList.remove('locked');
-            lockIcon.classList.add('unlocked');
+            lockIcon.classList.remove('fa-lock');
+            lockIcon.classList.add('fa-lock-open');
             
-            await new Promise(resolve => setTimeout(resolve, 1000)); // アニメーション待機 (1秒)
+            await new Promise(resolve => setTimeout(resolve, 600)); // アニメーション待機
 
-            // 2. ロック画面を非表示に
-            lockScreen.classList.remove('active');
-            lockScreen.style.display = 'none';
+            // 2. 白い画面へフェードイン
+            whiteFadeOverlay.classList.add('visible');
+            await new Promise(resolve => setTimeout(resolve, 600)); // フェードイン待機
 
-            // 3. 白い画面へフェードイン
-            whiteFadeOverlay.classList.add('active');
-            await new Promise(resolve => setTimeout(resolve, 500)); // フェードイン待機 (0.5秒)
+            // 3. ロック画面を非表示に
+            lockScreen.classList.remove('visible');
+            setTimeout(() => lockScreen.style.display = 'none', 500);
 
-            // 4. Cookieを保存してローディング開始
+            // 4. Cookie保存 & ローディング開始
             setCookie(`unlocked-${event.id}`, 'true', 365);
-            whiteFadeOverlay.classList.remove('active'); // 白いオーバーレイを非表示に戻す (Loading画面で隠れるため厳密には不要だが念のため)
             startLoadingAnimation();
+            
+            // 5. 白い画面をフェードアウト
+            setTimeout(() => whiteFadeOverlay.classList.remove('visible'), 500);
 
         } else {
             errorMessage.textContent = '暗号キーが正しくありません。';
-            keyInput.classList.add('shake'); // 揺れるアニメーション
-            setTimeout(() => keyInput.classList.remove('shake'), 500);
         }
     };
 }
 
 // (以下、前回のコードから変更なし)
-// ===== 暗号キーの検証アルゴリズム =====
 function validateProductKey(key, eventId, secret) {
     if (!key || !eventId || !secret) return false;
     const parts = key.split('-');
     if (parts.length !== 4) return false;
-    const idPart = parts[0];
-    const part1 = parts[1];
-    const part2 = parts[2];
-    const checksum = parts[3];
+    const idPart = parts[0], part1 = parts[1], part2 = parts[2], checksum = parts[3];
     if (idPart !== eventId.substring(0, 2).toUpperCase()) return false;
     let hash = 0;
     const combinedString = `${eventId}-${secret}-${part1}-${part2}`;
@@ -99,8 +91,6 @@ function validateProductKey(key, eventId, secret) {
     const calculatedChecksum = (hash & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
     return checksum === calculatedChecksum;
 }
-
-// ===== ローディング画面の制御 =====
 function startLoadingAnimation() {
     const loadingScreen = document.getElementById('loading-screen');
     if (!loadingScreen) return;
@@ -134,8 +124,6 @@ function startLoadingAnimation() {
     }
     requestAnimationFrame(updateProgress);
 }
-
-// ===== メインコンテンツの処理 =====
 function initializeMainContent(currentEvent) {
     const containerEl = document.querySelector('.container');
     const eventNameEl = document.getElementById('event-name');
@@ -153,7 +141,6 @@ function initializeMainContent(currentEvent) {
     const loadingMessageEl = document.getElementById('loading-message');
     const skinCtx = skinCanvas.getContext('2d');
     const previewCtx = previewCanvas.getContext('2d');
-
     const loadedFonts = new Set();
     function loadGoogleFont(fontName) {
         if (!fontName || loadedFonts.has(fontName)) return;
@@ -174,7 +161,6 @@ function initializeMainContent(currentEvent) {
         }
     }
     applyCustomFonts(currentEvent);
-
     if (currentEvent.bgImage) {
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
         containerEl.classList.add('bg-image-mode');
@@ -187,17 +173,14 @@ function initializeMainContent(currentEvent) {
         if (currentEvent.textColor) { updateContainerColor(currentEvent.bgColor, currentEvent.textColor); }
         else { updateContainerColor(currentEvent.bgColor); }
     }
-
     eventNameEl.textContent = currentEvent.name;
     descriptionEl.textContent = `あなたのスキンをアップロードして、「${currentEvent.name}」限定スキンと合成しよう！`;
     if (currentEvent.logo) { eventLogoEl.src = currentEvent.logo; eventLogoEl.style.display = 'block'; }
-    
     const costumeImg = new Image();
     costumeImg.crossOrigin = "anonymous";
     costumeImg.src = currentEvent.skin;
     costumeImg.onload = () => { loadingMessageEl.style.display = 'none'; mixerUiEl.style.display = 'block'; };
     costumeImg.onerror = () => { showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。'); };
-
     uploader.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -231,7 +214,6 @@ function initializeMainContent(currentEvent) {
         };
         reader.readAsDataURL(file);
     });
-    
     function updateContainerColor(hexColor, textColor) {
         const r = parseInt(hexColor.substr(1, 2), 16), g = parseInt(hexColor.substr(3, 2), 16), b = parseInt(hexColor.substr(5, 2), 16);
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
