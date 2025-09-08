@@ -11,18 +11,18 @@
 
     <div id="lock-screen" style="display: none;">
         <div class="lock-container">
-            <h2>認証が必要です</h2>
             <div id="lock-icon-area">
-                <i id="lock-icon" class="fas fa-lock locked"></i>
+                <i id="lock-icon" class="fas fa-lock"></i>
             </div>
+            <h2>認証が必要です</h2>
             <p>暗号キーを入力してください</p>
             <input type="text" id="key-input" placeholder="例: CS-XXXX-XXXX-XXXX">
             <button id="unlock-button">認証</button>
             <p id="lock-error-message" class="error"></p>
         </div>
     </div>
-
-    <div id="white-fade-overlay" class="fade-overlay"></div>
+    
+    <div id="white-fade-overlay"></div>
 
     <div id="loading-screen" style="display: none;">
         <div id="loading-gate-top">
