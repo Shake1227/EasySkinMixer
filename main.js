@@ -1,5 +1,6 @@
 // ===== ローディング画面の制御 =====
 document.addEventListener('DOMContentLoaded', () => {
+    // (ローディング画面のコードは変更なし)
     const loadingScreen = document.getElementById('loading-screen');
     const percentEl = document.getElementById('progress-percent');
     const barEl = document.getElementById('progress-bar');
@@ -34,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== メインコンテンツの処理 =====
 function initializeMainContent() {
+    // (UI要素取得などのコードは変更なし)
     const containerEl = document.querySelector('.container');
     const eventNameEl = document.getElementById('event-name');
     const eventLogoEl = document.getElementById('event-logo');
@@ -52,12 +54,16 @@ function initializeMainContent() {
     const previewCtx = previewCanvas.getContext('2d');
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get('event');
-
+    
     if (!eventId) { showError('無効なURLです。企画IDが指定されていません。'); return; }
     const currentEvent = EVENTS.find(e => e.id === eventId);
     if (!currentEvent) { showError('指定された企画が見つかりませんでした。'); return; }
 
+    // ===== フォント適用処理を追加 =====
+    applyCustomFonts(currentEvent);
+
     if (currentEvent.bgImage) {
+        // (背景画像処理は変更なし)
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
         containerEl.classList.add('bg-image-mode');
         uploadAreaEl.classList.add('bg-image-mode');
@@ -65,6 +71,7 @@ function initializeMainContent() {
         if (currentEvent.textColor) { containerEl.style.setProperty('--header-color', currentEvent.textColor); }
         else { containerEl.style.setProperty('--header-color', '#1a73e8'); }
     } else if (currentEvent.bgColor) {
+        // (背景色処理は変更なし)
         document.body.style.backgroundColor = currentEvent.bgColor;
         if (currentEvent.textColor) { updateContainerColor(currentEvent.bgColor, currentEvent.textColor); }
         else { updateContainerColor(currentEvent.bgColor); }
@@ -80,21 +87,16 @@ function initializeMainContent() {
     costumeImg.onload = () => { loadingMessageEl.style.display = 'none'; mixerUiEl.style.display = 'block'; };
     costumeImg.onerror = () => { showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。'); };
 
-    // ===== ファイル選択時のアニメーション処理を修正 =====
     uploader.addEventListener('change', (e) => {
+        // (ファイル選択時の処理は変更なし)
         const file = e.target.files[0];
         if (!file) return;
         fileNameEl.textContent = file.name;
         errorMessageEl.textContent = '';
-
-        // アニメーションをリセット
         previewArea.classList.remove('visible');
         previewCanvas.classList.remove('visible');
         downloadButton.classList.remove('visible');
-        
-        // previewAreaを即座に表示状態にする (max-heightアニメーションはまだ始まらない)
         previewArea.style.display = 'block';
-
         const reader = new FileReader();
         reader.onload = (event) => {
             const userSkinImg = new Image();
@@ -104,37 +106,44 @@ function initializeMainContent() {
                     previewArea.style.display = 'none';
                     return;
                 }
-
                 mixSkins(userSkinImg, costumeImg);
                 drawPreview(skinCanvas);
-
-                // 1. プレビューエリアを伸ばす
-                // プレビューエリアがdisplay:block;になった後、少し待ってからvisibleクラスを追加
                 setTimeout(() => {
                     previewArea.classList.add('visible');
-                    // max-heightアニメーション完了後にスクロール開始
-                    // CSSのmax-height transition duration (0.8s) + 少しの余裕 (0.2s)
                     setTimeout(() => {
                         previewArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 1000); // 1.0秒後
-                }, 100); // 0.1秒後
-
-                // 2. プレビュー画像をフェードイン
-                setTimeout(() => {
-                    previewCanvas.classList.add('visible');
-                }, 1800); // 1.8秒後 (変更)
-
-                // 3. ダウンロードボタンをスライドイン
-                setTimeout(() => {
-                    downloadButton.classList.add('visible');
-                }, 2200); // 2.2秒後 (変更)
-
+                    }, 1000);
+                }, 100);
+                setTimeout(() => { previewCanvas.classList.add('visible'); }, 1800);
+                setTimeout(() => { downloadButton.classList.add('visible'); }, 2200);
             };
             userSkinImg.src = event.target.result;
         };
         reader.readAsDataURL(file);
     });
     
+    // ===== フォントを読み込み適用する関数を追加 =====
+    const loadedFonts = new Set(); // 読み込み済みのフォントを記録
+    function loadGoogleFont(fontName) {
+        if (!fontName || loadedFonts.has(fontName)) return;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}&display=swap`;
+        document.head.appendChild(link);
+        loadedFonts.add(fontName);
+    }
+    function applyCustomFonts(event) {
+        if (event.titleFont) {
+            loadGoogleFont(event.titleFont);
+            eventNameEl.style.fontFamily = `'${event.titleFont}', sans-serif`;
+        }
+        if (event.descriptionFont) {
+            loadGoogleFont(event.descriptionFont);
+            descriptionEl.style.fontFamily = `'${event.descriptionFont}', sans-serif`;
+        }
+    }
+
+    // (以下の関数は変更なし)
     function updateContainerColor(hexColor, textColor) {
         const r = parseInt(hexColor.substr(1, 2), 16), g = parseInt(hexColor.substr(3, 2), 16), b = parseInt(hexColor.substr(5, 2), 16);
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
