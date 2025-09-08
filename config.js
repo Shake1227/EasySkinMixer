@@ -8,7 +8,7 @@ const EVENTS = [
         logo: 'http://www.floral-village.info/up/1757264384.png', // 企画ロゴのURL (なければ空文字)
         skin: './skins/casino_suit.png', // 服装スキンのファイルパス
         bgImage: 'http://www.floral-village.info/up/1757334996.png',
-        textColor: '#000000',
+        textColor: '#000000', // タイトルのカラー
         titleFont: 'Kaisei Tokumin', // タイトル用のフォント
         descriptionFont: 'Kaisei HarunoUmi', // 説明文用のフォント
         lock: false, // trueにするとこの企画にロックがかかる
