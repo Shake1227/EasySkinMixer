@@ -18,16 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
         else { percentEl.textContent = '100%'; barEl.style.width = '100%'; finishLoadingAnimation(); }
     }
     function finishLoadingAnimation() {
-        // ===== アニメーションの「間」を長くする =====
         setTimeout(() => {
-            loadingScreen.classList.add('loaded'); // 数字が消え、Loading!が表示
+            loadingScreen.classList.add('loaded');
             setTimeout(() => {
-                loadingScreen.classList.add('gate-open'); // ゲートが開く
+                loadingScreen.classList.add('gate-open');
                 containerEl.style.visibility = 'visible';
                 document.body.style.overflow = 'auto';
-            }, 1200); // 1.2秒後 (延長)
-            setTimeout(() => { loadingScreen.style.display = 'none'; }, 2200); // 2.2秒後 (延長)
-        }, 400); // 0.4秒後 (延長)
+            }, 1200);
+            setTimeout(() => { loadingScreen.style.display = 'none'; }, 2200);
+        }, 400);
     }
     requestAnimationFrame(updateProgress);
     initializeMainContent();
@@ -88,9 +87,13 @@ function initializeMainContent() {
         fileNameEl.textContent = file.name;
         errorMessageEl.textContent = '';
 
+        // アニメーションをリセット
         previewArea.classList.remove('visible');
         previewCanvas.classList.remove('visible');
         downloadButton.classList.remove('visible');
+        
+        // previewAreaを即座に表示状態にする (max-heightアニメーションはまだ始まらない)
+        previewArea.style.display = 'block';
 
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -105,27 +108,26 @@ function initializeMainContent() {
                 mixSkins(userSkinImg, costumeImg);
                 drawPreview(skinCanvas);
 
-                // ===== アニメーションのタイミングを全体的に遅くする =====
-                previewArea.style.display = 'block';
-                
                 // 1. プレビューエリアを伸ばす
+                // プレビューエリアがdisplay:block;になった後、少し待ってからvisibleクラスを追加
                 setTimeout(() => {
                     previewArea.classList.add('visible');
-                    // 伸ばし終わったタイミングでスクロール
+                    // max-heightアニメーション完了後にスクロール開始
+                    // CSSのmax-height transition duration (0.8s) + 少しの余裕 (0.2s)
                     setTimeout(() => {
                         previewArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 800); // 0.8秒後
-                }, 100);
+                    }, 1000); // 1.0秒後
+                }, 100); // 0.1秒後
 
                 // 2. プレビュー画像をフェードイン
                 setTimeout(() => {
                     previewCanvas.classList.add('visible');
-                }, 1200); // 1.2秒後 (延長)
+                }, 1800); // 1.8秒後 (変更)
 
                 // 3. ダウンロードボタンをスライドイン
                 setTimeout(() => {
                     downloadButton.classList.add('visible');
-                }, 1600); // 1.6秒後 (延長)
+                }, 2200); // 2.2秒後 (変更)
 
             };
             userSkinImg.src = event.target.result;
