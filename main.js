@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeMainContent(currentEvent);
 });
 
-// ===== ロック画面の制御 (プロダクトキー方式に修正) =====
+// ===== ロック画面の制御 (プロダクトキー方式) =====
 function showLockScreen(event) {
     const lockScreen = document.getElementById('lock-screen');
     const keyInput = document.getElementById('key-input');
@@ -37,7 +37,6 @@ function showLockScreen(event) {
 
     unlockButton.onclick = () => {
         const inputKey = keyInput.value.trim().toUpperCase();
-        // キーの検証ロジックを呼び出す
         if (validateProductKey(inputKey, event.id, event.lockSecret)) {
             setCookie(`unlocked-${event.id}`, 'true', 365);
             lockScreen.style.display = 'none';
@@ -51,38 +50,25 @@ function showLockScreen(event) {
 // ===== 暗号キーの検証アルゴリズム =====
 function validateProductKey(key, eventId, secret) {
     if (!key || !eventId || !secret) return false;
-
     const parts = key.split('-');
-    // キーの形式チェック: [ID]-[PART1]-[PART2]-[CHECKSUM]
     if (parts.length !== 4) return false;
-
     const idPart = parts[0];
     const part1 = parts[1];
     const part2 = parts[2];
     const checksum = parts[3];
-
-    // 1. 企画IDのチェック
     if (idPart !== eventId.substring(0, 2).toUpperCase()) return false;
-    
-    // 2. チェックサムの再計算
-    // (ジェネレーターと全く同じ計算方法)
     let hash = 0;
     const combinedString = `${eventId}-${secret}-${part1}-${part2}`;
     for (let i = 0; i < combinedString.length; i++) {
         const char = combinedString.charCodeAt(i);
         hash = ((hash << 5) - hash) + char;
-        hash |= 0; // 32bit整数に変換
+        hash |= 0;
     }
-    
-    // 計算結果を4桁の16進数に
     const calculatedChecksum = (hash & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
-
-    // 3. 入力されたチェックサムと計算結果を比較
     return checksum === calculatedChecksum;
 }
 
-
-// (ローディング画面、メインコンテンツの処理は変更なし)
+// ===== ローディング画面の制御 =====
 function startLoadingAnimation() {
     const loadingScreen = document.getElementById('loading-screen');
     if (!loadingScreen) return;
@@ -116,6 +102,8 @@ function startLoadingAnimation() {
     }
     requestAnimationFrame(updateProgress);
 }
+
+// ===== メインコンテンツの処理 =====
 function initializeMainContent(currentEvent) {
     const containerEl = document.querySelector('.container');
     const eventNameEl = document.getElementById('event-name');
@@ -133,7 +121,31 @@ function initializeMainContent(currentEvent) {
     const loadingMessageEl = document.getElementById('loading-message');
     const skinCtx = skinCanvas.getContext('2d');
     const previewCtx = previewCanvas.getContext('2d');
-    applyCustomFonts(currentEvent);
+
+    // ===== ここから修正: フォント関連の関数定義を先に移動 =====
+    const loadedFonts = new Set();
+    function loadGoogleFont(fontName) {
+        if (!fontName || loadedFonts.has(fontName)) return;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}&display=swap`;
+        document.head.appendChild(link);
+        loadedFonts.add(fontName);
+    }
+    function applyCustomFonts(event) {
+        if (event.titleFont) {
+            loadGoogleFont(event.titleFont);
+            eventNameEl.style.fontFamily = `'${event.titleFont}', sans-serif`;
+        }
+        if (event.descriptionFont) {
+            loadGoogleFont(event.descriptionFont);
+            descriptionEl.style.fontFamily = `'${event.descriptionFont}', sans-serif`;
+        }
+    }
+    // ===== ここまで修正 =====
+
+    applyCustomFonts(currentEvent); // フォント適用処理を呼び出し
+
     if (currentEvent.bgImage) {
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
         containerEl.classList.add('bg-image-mode');
@@ -146,14 +158,17 @@ function initializeMainContent(currentEvent) {
         if (currentEvent.textColor) { updateContainerColor(currentEvent.bgColor, currentEvent.textColor); }
         else { updateContainerColor(currentEvent.bgColor); }
     }
+
     eventNameEl.textContent = currentEvent.name;
     descriptionEl.textContent = `あなたのスキンをアップロードして、「${currentEvent.name}」限定スキンと合成しよう！`;
     if (currentEvent.logo) { eventLogoEl.src = currentEvent.logo; eventLogoEl.style.display = 'block'; }
+    
     const costumeImg = new Image();
     costumeImg.crossOrigin = "anonymous";
     costumeImg.src = currentEvent.skin;
     costumeImg.onload = () => { loadingMessageEl.style.display = 'none'; mixerUiEl.style.display = 'block'; };
     costumeImg.onerror = () => { showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。'); };
+
     uploader.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -187,25 +202,7 @@ function initializeMainContent(currentEvent) {
         };
         reader.readAsDataURL(file);
     });
-    const loadedFonts = new Set();
-    function loadGoogleFont(fontName) {
-        if (!fontName || loadedFonts.has(fontName)) return;
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}&display=swap`;
-        document.head.appendChild(link);
-        loadedFonts.add(fontName);
-    }
-    function applyCustomFonts(event) {
-        if (event.titleFont) {
-            loadGoogleFont(event.titleFont);
-            eventNameEl.style.fontFamily = `'${event.titleFont}', sans-serif`;
-        }
-        if (event.descriptionFont) {
-            loadGoogleFont(event.descriptionFont);
-            descriptionEl.style.fontFamily = `'${event.descriptionFont}', sans-serif`;
-        }
-    }
+    
     function updateContainerColor(hexColor, textColor) {
         const r = parseInt(hexColor.substr(1, 2), 16), g = parseInt(hexColor.substr(3, 2), 16), b = parseInt(hexColor.substr(5, 2), 16);
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
