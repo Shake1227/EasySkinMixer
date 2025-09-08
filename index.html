@@ -7,8 +7,25 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
+
+    <div id="loading-screen">
+        <div id="loading-gate-top">
+            <div class="loading-content top">
+                <div class="progress-container">
+                    <span id="progress-percent">0%</span>
+                    <div class="progress-bar-background">
+                        <div id="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="loading-gate-bottom">
+            <div class="loading-content bottom">
+                 <h2 id="loading-text">Loading!</h2>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="visibility: hidden;"> <header>
             <img id="event-logo" src="" alt="企画ロゴ" style="display: none;">
             <h1 id="event-name">EasySkinMixer</h1>
         </header>
