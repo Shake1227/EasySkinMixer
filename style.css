@@ -23,7 +23,6 @@ body {
 
 header {
     margin-bottom: 1.5rem;
-    /* ロゴとタイトルを中央に配置 */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -37,11 +36,10 @@ header {
 }
 
 #event-logo {
-    /* ★★ここを修正★★ */
-    max-width: 300px;  /* さらに大きく */
-    max-height: 150px; /* さらに大きく */
-    background-color: white; /* 透過背景が黒くなるのを防ぐ */
-    border-radius: 8px; /* 角を少し丸める */
+    max-width: 300px; 
+    max-height: 150px;
+    background-color: white;
+    border-radius: 8px; 
 }
 
 .upload-area {
