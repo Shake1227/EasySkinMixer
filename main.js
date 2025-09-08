@@ -1,5 +1,5 @@
-// EasySkinMixer - Main Logic (バージョンFinal - 2Dイラストプレビュー)
-console.log("EasySkinMixer: 2Dイラストプレビュー最終版のスクリプトを読み込みました。");
+// EasySkinMixer - Main Logic
+console.log("EasySkinMixer: プレビューのスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
     // UI要素の取得
@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const uploader = document.getElementById('user-skin-upload');
     const fileNameEl = document.getElementById('file-name');
     const previewArea = document.getElementById('preview-area');
-    const skinCanvas = document.getElementById('skin-canvas'); // 合成・DL用 (非表示)
-    const previewCanvas = document.getElementById('preview-canvas'); // プレビュー用 (表示)
+    const skinCanvas = document.getElementById('skin-canvas'); 
+    const previewCanvas = document.getElementById('preview-canvas');
     const downloadButton = document.getElementById('download-button');
     const errorMessageEl = document.getElementById('error-message');
     const mixerUiEl = document.getElementById('mixer-ui');
@@ -97,21 +97,17 @@ document.addEventListener('DOMContentLoaded', () => {
             previewCtx.drawImage(sourceCanvas, sx, sy, sw, sh, dx * scale, dy * scale, sw * scale, sh * scale);
         };
 
-        // レイヤー1 (奥のパーツ)
         drawPart(4, 20, 4, 12, 8, 20);  // 右脚
         drawPart(44, 20, 4, 12, 12, 8); // 右腕
         
-        // レイヤー2 (胴体)
         drawPart(20, 20, 8, 12, 4, 8);  // 胴体
         drawPart(20, 36, 8, 12, 4, 8);  // 胴体上着
 
-        // レイヤー3 (手前のパーツ)
         drawPart(4, 20, 4, 12, 4, 20);  // 左脚
         drawPart(4, 36, 4, 12, 4, 20);  // 左脚上着
         drawPart(44, 20, 4, 12, 0, 8);  // 左腕
         drawPart(60, 20, 4, 12, 0, 8);  // 左腕上着
 
-        // レイヤー4 (頭)
         drawPart(8, 8, 8, 8, 4, 0);    // 頭
         drawPart(40, 8, 8, 8, 4, 0);   // 頭上着
     }
