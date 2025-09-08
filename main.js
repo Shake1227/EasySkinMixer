@@ -5,53 +5,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const barEl = document.getElementById('progress-bar');
     const containerEl = document.querySelector('.container');
 
-    const loadingDuration = 3000; // 3秒に短縮
+    const loadingDuration = 3000; // 3秒
     const startTime = Date.now();
 
-    // 緩急（イーズイン・アウト）をつけるための関数
     function easeInOutCubic(t) {
         return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
 
-    // 毎フレームごとにプログレスバーを更新する関数
     function updateProgress() {
         const elapsedTime = Date.now() - startTime;
-        const timeFraction = Math.min(1, elapsedTime / loadingDuration); // 0から1の進捗率
-        const easedProgress = easeInOutCubic(timeFraction); // 緩急をつけた進捗率
+        const timeFraction = Math.min(1, elapsedTime / loadingDuration);
+        const easedProgress = easeInOutCubic(timeFraction);
 
         const percent = Math.floor(easedProgress * 100);
         percentEl.textContent = `${percent}%`;
         barEl.style.width = `${percent}%`;
 
         if (timeFraction < 1) {
-            // 100%未満なら次のフレームを要求
             requestAnimationFrame(updateProgress);
         } else {
-            // 100%になったらアニメーションを完了させる
+            // 100%になった瞬間にテキストを更新してからアニメーションを完了
+            percentEl.textContent = '100%';
+            barEl.style.width = '100%';
             finishLoadingAnimation();
         }
     }
 
     function finishLoadingAnimation() {
-        loadingScreen.classList.add('loaded'); // "Loading!"テキストのアニメーションを開始
-
-        // "Loading!"表示後、ゲートを開く
+        // 100%表示後、少し間を置いて次のアニメーションへ
         setTimeout(() => {
-            loadingScreen.classList.add('gate-open');
-            containerEl.style.visibility = 'visible';
-            document.body.style.overflow = 'auto';
-        }, 800); // 0.8秒後
+            loadingScreen.classList.add('loaded'); // "Loading!"テキストと数字フェードアウトを開始
 
-        // ゲートが開き終わったらローディング画面を非表示に
-        setTimeout(() => {
-            loadingScreen.style.display = 'none';
-        }, 1800); // 1.8秒後
+            // "Loading!"表示後、ゲートを開く
+            setTimeout(() => {
+                loadingScreen.classList.add('gate-open');
+                containerEl.style.visibility = 'visible';
+                document.body.style.overflow = 'auto';
+            }, 800); // 0.8秒後
+
+            // ゲートが開き終わったらローディング画面を非表示に
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 1800); // 1.8秒後
+        }, 100); // 0.1秒の間
     }
     
-    // アニメーション開始
     requestAnimationFrame(updateProgress);
 
-    // ===== 元のメインコンテンツ初期化処理 =====
     initializeMainContent(); 
 });
 
