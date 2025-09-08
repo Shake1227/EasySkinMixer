@@ -1,61 +1,58 @@
-// ===== ローディング画面の制御を追加 =====
+// ===== ローディング画面の制御を修正 =====
 document.addEventListener('DOMContentLoaded', () => {
     const loadingScreen = document.getElementById('loading-screen');
     const percentEl = document.getElementById('progress-percent');
     const barEl = document.getElementById('progress-bar');
-    const loadingText = document.getElementById('loading-text'); // Loading!テキストを取得
-    const mainContainerEl = document.querySelector('.container'); // メインコンテンツのコンテナ
+    const containerEl = document.querySelector('.container');
 
-    // mainContainerEl を最初から非表示にする（visibility: hidden;）
-    mainContainerEl.style.visibility = 'hidden';
-
-    const loadingDuration = 5000; // 5秒
+    const loadingDuration = 3000; // 3秒に短縮
     const startTime = Date.now();
 
-    // 緩急をつけるためのイージング関数
-    // 参考: https://easings.net/#easeInOutCubic
+    // 緩急（イーズイン・アウト）をつけるための関数
     function easeInOutCubic(t) {
         return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
     }
 
-    function animateProgress() {
+    // 毎フレームごとにプログレスバーを更新する関数
+    function updateProgress() {
         const elapsedTime = Date.now() - startTime;
-        let t = Math.min(1, elapsedTime / loadingDuration); // 0から1へ正規化された時間
+        const timeFraction = Math.min(1, elapsedTime / loadingDuration); // 0から1の進捗率
+        const easedProgress = easeInOutCubic(timeFraction); // 緩急をつけた進捗率
 
-        let easedT = easeInOutCubic(t); // イージングを適用
+        const percent = Math.floor(easedProgress * 100);
+        percentEl.textContent = `${percent}%`;
+        barEl.style.width = `${percent}%`;
 
-        let progress = easedT * 100;
-
-        percentEl.textContent = `${Math.floor(progress)}%`;
-        barEl.style.width = `${progress}%`;
-
-        if (t < 1) {
-            requestAnimationFrame(animateProgress);
+        if (timeFraction < 1) {
+            // 100%未満なら次のフレームを要求
+            requestAnimationFrame(updateProgress);
         } else {
-            // 100%になったらアニメーションを開始
-            percentEl.style.opacity = '0'; // 数字をフェードアウト
-            loadingText.style.visibility = 'visible';
-            loadingText.style.animation = 'drop-down 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards';
-
-            // "Loading!"表示後、ゲートを開く
-            setTimeout(() => {
-                loadingScreen.classList.add('gate-open');
-                mainContainerEl.style.visibility = 'visible'; // メインコンテンツを表示
-                document.body.style.overflow = 'auto'; // スクロールを再度有効に
-            }, 1000); // "Loading!"の落下アニメーション完了後
-
-            // ゲートが開き終わったらローディング画面を完全に非表示に
-            setTimeout(() => {
-                loadingScreen.style.display = 'none';
-            }, 1800); // ゲートのトランジション (0.8s) + 少し余裕
+            // 100%になったらアニメーションを完了させる
+            finishLoadingAnimation();
         }
+    }
+
+    function finishLoadingAnimation() {
+        loadingScreen.classList.add('loaded'); // "Loading!"テキストのアニメーションを開始
+
+        // "Loading!"表示後、ゲートを開く
+        setTimeout(() => {
+            loadingScreen.classList.add('gate-open');
+            containerEl.style.visibility = 'visible';
+            document.body.style.overflow = 'auto';
+        }, 800); // 0.8秒後
+
+        // ゲートが開き終わったらローディング画面を非表示に
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 1800); // 1.8秒後
     }
     
     // アニメーション開始
-    animateProgress();
+    requestAnimationFrame(updateProgress);
 
     // ===== 元のメインコンテンツ初期化処理 =====
-    initializeMainContent();
+    initializeMainContent(); 
 });
 
 
@@ -145,7 +142,6 @@ function initializeMainContent() {
                     previewArea.style.display = 'none';
                     return;
                 }
-
                 mixSkins(userSkinImg, costumeImg);
                 drawPreview(skinCanvas);
                 previewArea.style.display = 'block';
