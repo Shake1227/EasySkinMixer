@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (getCookie(`unlocked-${eventId}`) === 'true') {
             startLoadingAnimation();
         } else {
+            // ロック画面を表示する前に、フェードオーバーレイとローディング画面を非表示に
+            document.getElementById('white-fade-overlay').style.opacity = '0';
+            document.getElementById('white-fade-overlay').style.visibility = 'hidden';
+            document.getElementById('loading-screen').style.display = 'none';
+            
             showLockScreen(currentEvent);
         }
     } else {
@@ -26,27 +31,54 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeMainContent(currentEvent);
 });
 
-// ===== ロック画面の制御 (プロダクトキー方式) =====
+// ===== ロック画面の制御 (プロダクトキー方式 & アニメーション) =====
 function showLockScreen(event) {
     const lockScreen = document.getElementById('lock-screen');
     const keyInput = document.getElementById('key-input');
     const unlockButton = document.getElementById('unlock-button');
     const errorMessage = document.getElementById('lock-error-message');
+    const lockIcon = document.getElementById('lock-icon');
+    const whiteFadeOverlay = document.getElementById('white-fade-overlay');
 
     lockScreen.style.display = 'flex';
+    lockScreen.classList.add('active'); // フェードイン用
+    lockIcon.className = 'fas fa-lock locked'; // 初期状態をロックに設定
 
-    unlockButton.onclick = () => {
+    unlockButton.onclick = async () => {
         const inputKey = keyInput.value.trim().toUpperCase();
         if (validateProductKey(inputKey, event.id, event.lockSecret)) {
-            setCookie(`unlocked-${event.id}`, 'true', 365);
+            errorMessage.textContent = ''; // エラーメッセージをクリア
+            keyInput.disabled = true; // キー入力とボタンを無効化
+            unlockButton.disabled = true;
+
+            // 1. 南京錠解除アニメーション
+            lockIcon.classList.remove('locked');
+            lockIcon.classList.add('unlocked');
+            
+            await new Promise(resolve => setTimeout(resolve, 1000)); // アニメーション待機 (1秒)
+
+            // 2. ロック画面を非表示に
+            lockScreen.classList.remove('active');
             lockScreen.style.display = 'none';
+
+            // 3. 白い画面へフェードイン
+            whiteFadeOverlay.classList.add('active');
+            await new Promise(resolve => setTimeout(resolve, 500)); // フェードイン待機 (0.5秒)
+
+            // 4. Cookieを保存してローディング開始
+            setCookie(`unlocked-${event.id}`, 'true', 365);
+            whiteFadeOverlay.classList.remove('active'); // 白いオーバーレイを非表示に戻す (Loading画面で隠れるため厳密には不要だが念のため)
             startLoadingAnimation();
+
         } else {
             errorMessage.textContent = '暗号キーが正しくありません。';
+            keyInput.classList.add('shake'); // 揺れるアニメーション
+            setTimeout(() => keyInput.classList.remove('shake'), 500);
         }
     };
 }
 
+// (以下、前回のコードから変更なし)
 // ===== 暗号キーの検証アルゴリズム =====
 function validateProductKey(key, eventId, secret) {
     if (!key || !eventId || !secret) return false;
@@ -122,7 +154,6 @@ function initializeMainContent(currentEvent) {
     const skinCtx = skinCanvas.getContext('2d');
     const previewCtx = previewCanvas.getContext('2d');
 
-    // ===== ここから修正: フォント関連の関数定義を先に移動 =====
     const loadedFonts = new Set();
     function loadGoogleFont(fontName) {
         if (!fontName || loadedFonts.has(fontName)) return;
@@ -142,9 +173,7 @@ function initializeMainContent(currentEvent) {
             descriptionEl.style.fontFamily = `'${event.descriptionFont}', sans-serif`;
         }
     }
-    // ===== ここまで修正 =====
-
-    applyCustomFonts(currentEvent); // フォント適用処理を呼び出し
+    applyCustomFonts(currentEvent);
 
     if (currentEvent.bgImage) {
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
