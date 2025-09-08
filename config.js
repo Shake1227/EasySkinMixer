@@ -18,7 +18,7 @@ const EVENTS = [
         id: 'example', // 企画のID (URLに使われます。半角英数字で)
         name: 'サンプルページ（学校の制服）', // 企画名
         logo: 'http://www.floral-village.info/up/1757264384.png', // 企画ロゴのURL (なければ空文字)
-        skin: './skins/casino_suit.png', // 服装スキンのファイルパス
+        skin: './skins/example.png', // 服装スキンのファイルパス
         bgImage: 'http://www.floral-village.info/up/1757373978.png',
         textColor: '#000000', // タイトルのカラー
         // titleFont: 'Kaisei Tokumin', // タイトル用のフォント
