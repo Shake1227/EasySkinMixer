@@ -19,6 +19,7 @@ body {
     /* CSS変数を定義。JSからこれらの値を変更する */
     --container-bg: #fff;
     --text-color: #333;
+    --header-color: #1a73e8; /* 企画名のデフォルト色（青）を変数化 */
     --upload-area-bg: #fafafa;
     --upload-area-border: #ccc;
 
@@ -54,7 +55,7 @@ header {
 
 #event-name {
     font-size: 2rem;
-    color: #1a73e8;
+    color: var(--header-color); /* 青色固定をやめ、変数を使用 */
     margin-top: 15px;
     white-space: nowrap;
 }
