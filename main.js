@@ -47,12 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. 背景色が指定されている場合
     else if (currentEvent.bgColor) {
         document.body.style.backgroundColor = currentEvent.bgColor;
-        // textColorの指定があればそれを使い、なければ自動調整する
-        if (currentEvent.textColor) {
-            updateContainerColor(currentEvent.bgColor, currentEvent.textColor);
-        } else {
-            updateContainerColor(currentEvent.bgColor);
-        }
+        updateContainerColor(currentEvent.bgColor, currentEvent.textColor);
     }
     // ===== 背景設定のロジックここまで =====
 
@@ -102,31 +97,38 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * 背景色に合わせてコンテナの配色を更新する関数
      * @param {string} hexColor - #RRGGBB形式のカラーコード
-     * @param {string} [textColor] - (任意) #RRGGBB形式の文字色
+     * @param {string} [customTextColor] - (任意) #RRGGBB形式の文字色
      */
-    function updateContainerColor(hexColor, textColor) {
+    function updateContainerColor(hexColor, customTextColor) {
         const r = parseInt(hexColor.substr(1, 2), 16);
         const g = parseInt(hexColor.substr(3, 2), 16);
         const b = parseInt(hexColor.substr(5, 2), 16);
-
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
 
-        // textColorが指定されていればそれを使い、なければ自動判定
-        const finalTextColor = textColor ? textColor : (yiq >= 128 ? '#333' : '#f8f9fa');
+        let finalTextColor;
+        if (customTextColor) {
+            // 任意指定の文字色があれば、それを最優先で使う
+            finalTextColor = customTextColor;
+        } else {
+            // なければ、背景の明るさから自動で文字色を判定する
+            finalTextColor = (yiq >= 128) ? '#333' : '#f8f9fa';
+        }
 
+        // 背景が明るいか暗いかで、コンテナやアップロードエリアの背景色を決める
         if (yiq >= 128) {
             // 明るい背景
             containerEl.style.setProperty('--container-bg', 'rgba(0, 0, 0, 0.05)');
-            containerEl.style.setProperty('--text-color', finalTextColor);
             containerEl.style.setProperty('--upload-area-bg', 'rgba(0, 0, 0, 0.03)');
             containerEl.style.setProperty('--upload-area-border', 'rgba(0, 0, 0, 0.2)');
         } else {
             // 暗い背景
             containerEl.style.setProperty('--container-bg', 'rgba(255, 255, 255, 0.1)');
-            containerEl.style.setProperty('--text-color', finalTextColor);
             containerEl.style.setProperty('--upload-area-bg', 'rgba(255, 255, 255, 0.05)');
             containerEl.style.setProperty('--upload-area-border', 'rgba(255, 255, 255, 0.2)');
         }
+        
+        // 最終的に決まった文字色を適用する
+        containerEl.style.setProperty('--text-color', finalTextColor);
     }
 
     function mixSkins(userSkin, costume) {
