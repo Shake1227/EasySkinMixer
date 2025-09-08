@@ -1,5 +1,62 @@
+// ===== ページの読み込み時の処理 =====
 document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get('event');
+    if (!eventId) {
+        document.body.innerHTML = '<h1>無効なURLです。企画IDが指定されていません。</h1>';
+        return;
+    }
+
+    const currentEvent = EVENTS.find(e => e.id === eventId);
+    if (!currentEvent) {
+        document.body.innerHTML = `<h1>指定された企画 (${eventId}) は見つかりませんでした。</h1>`;
+        return;
+    }
+
+    // ロック機能のチェック
+    if (currentEvent.lock === true) {
+        // Cookieに保存された認証情報をチェック
+        if (getCookie(`unlocked-${eventId}`) === 'true') {
+            startLoadingAnimation(); // 認証済みならローディング開始
+        } else {
+            showLockScreen(currentEvent); // 未認証ならロック画面表示
+        }
+    } else {
+        startLoadingAnimation(); // ロック不要ならローディング開始
+    }
+
+    initializeMainContent(currentEvent); // メインコンテンツの初期化
+});
+
+// ===== ロック画面の制御 =====
+function showLockScreen(event) {
+    const lockScreen = document.getElementById('lock-screen');
+    const keyInput = document.getElementById('key-input');
+    const unlockButton = document.getElementById('unlock-button');
+    const errorMessage = document.getElementById('lock-error-message');
+
+    lockScreen.style.display = 'flex';
+
+    unlockButton.onclick = () => {
+        const inputKey = keyInput.value.trim();
+        if (event.validKeys && event.validKeys.includes(inputKey)) {
+            // 認証成功
+            setCookie(`unlocked-${event.id}`, 'true', 365); // 365日間有効なCookieを保存
+            lockScreen.style.display = 'none';
+            startLoadingAnimation();
+        } else {
+            // 認証失敗
+            errorMessage.textContent = '暗号キーが正しくありません。';
+        }
+    };
+}
+
+// ===== ローディング画面の制御 =====
+function startLoadingAnimation() {
     const loadingScreen = document.getElementById('loading-screen');
+    if (!loadingScreen) return;
+    loadingScreen.style.display = 'block'; // ローディング画面を表示
+
     const percentEl = document.getElementById('progress-percent');
     const barEl = document.getElementById('progress-bar');
     const containerEl = document.querySelector('.container');
@@ -28,10 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 400);
     }
     requestAnimationFrame(updateProgress);
-    initializeMainContent();
-});
+}
 
-function initializeMainContent() {
+// ===== メインコンテンツの処理 =====
+function initializeMainContent(currentEvent) {
     const containerEl = document.querySelector('.container');
     const eventNameEl = document.getElementById('event-name');
     const eventLogoEl = document.getElementById('event-logo');
@@ -48,33 +105,7 @@ function initializeMainContent() {
     const loadingMessageEl = document.getElementById('loading-message');
     const skinCtx = skinCanvas.getContext('2d');
     const previewCtx = previewCanvas.getContext('2d');
-    const params = new URLSearchParams(window.location.search);
-    const eventId = params.get('event');
     
-    if (!eventId) { showError('無効なURLです。企画IDが指定されていません。'); return; }
-    const currentEvent = EVENTS.find(e => e.id === eventId);
-    if (!currentEvent) { showError('指定された企画が見つかりませんでした。'); return; }
-
-    const loadedFonts = new Set();
-    function loadGoogleFont(fontName) {
-        if (!fontName || loadedFonts.has(fontName)) return;
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}&display=swap`;
-        document.head.appendChild(link);
-        loadedFonts.add(fontName);
-    }
-    function applyCustomFonts(event) {
-        if (event.titleFont) {
-            loadGoogleFont(event.titleFont);
-            eventNameEl.style.fontFamily = `'${event.titleFont}', sans-serif`;
-        }
-        if (event.descriptionFont) {
-            loadGoogleFont(event.descriptionFont);
-            descriptionEl.style.fontFamily = `'${event.descriptionFont}', sans-serif`;
-        }
-    }
-
     applyCustomFonts(currentEvent);
 
     if (currentEvent.bgImage) {
@@ -134,6 +165,26 @@ function initializeMainContent() {
         reader.readAsDataURL(file);
     });
     
+    const loadedFonts = new Set();
+    function loadGoogleFont(fontName) {
+        if (!fontName || loadedFonts.has(fontName)) return;
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `https://fonts.googleapis.com/css2?family=${fontName.replace(/ /g, '+')}&display=swap`;
+        document.head.appendChild(link);
+        loadedFonts.add(fontName);
+    }
+    function applyCustomFonts(event) {
+        if (event.titleFont) {
+            loadGoogleFont(event.titleFont);
+            eventNameEl.style.fontFamily = `'${event.titleFont}', sans-serif`;
+        }
+        if (event.descriptionFont) {
+            loadGoogleFont(event.descriptionFont);
+            descriptionEl.style.fontFamily = `'${event.descriptionFont}', sans-serif`;
+        }
+    }
+    
     function updateContainerColor(hexColor, textColor) {
         const r = parseInt(hexColor.substr(1, 2), 16), g = parseInt(hexColor.substr(3, 2), 16), b = parseInt(hexColor.substr(5, 2), 16);
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
@@ -176,4 +227,25 @@ function initializeMainContent() {
         loadingMessageEl.style.display = 'none';
         errorMessageEl.textContent = message;
     }
+}
+
+// ===== Cookieを操作するためのヘルパー関数 =====
+function setCookie(name, value, days) {
+    let expires = "";
+    if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+function getCookie(name) {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
 }
