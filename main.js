@@ -1,4 +1,3 @@
-// ===== ローディング画面の制御 =====
 document.addEventListener('DOMContentLoaded', () => {
     const loadingScreen = document.getElementById('loading-screen');
     const percentEl = document.getElementById('progress-percent');
@@ -32,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeMainContent();
 });
 
-// ===== メインコンテンツの処理 =====
 function initializeMainContent() {
     const containerEl = document.querySelector('.container');
     const eventNameEl = document.getElementById('event-name');
@@ -57,7 +55,6 @@ function initializeMainContent() {
     const currentEvent = EVENTS.find(e => e.id === eventId);
     if (!currentEvent) { showError('指定された企画が見つかりませんでした。'); return; }
 
-    // ===== ここから修正: フォント関連の関数定義を先に移動 =====
     const loadedFonts = new Set();
     function loadGoogleFont(fontName) {
         if (!fontName || loadedFonts.has(fontName)) return;
@@ -77,9 +74,8 @@ function initializeMainContent() {
             descriptionEl.style.fontFamily = `'${event.descriptionFont}', sans-serif`;
         }
     }
-    // ===== ここまで修正 =====
 
-    applyCustomFonts(currentEvent); // フォント適用処理を呼び出し
+    applyCustomFonts(currentEvent);
 
     if (currentEvent.bgImage) {
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
