@@ -40,10 +40,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
         containerEl.classList.add('bg-image-mode');
         uploadAreaEl.classList.add('bg-image-mode');
+
+        // 背景画像の場合、タイトル以外の文字色は黒に固定
+        containerEl.style.setProperty('--text-color', '#333'); 
+        
+        // タイトルのみconfig.jsで指定された色を使用
         if (currentEvent.textColor) {
-            containerEl.style.color = currentEvent.textColor;
-            containerEl.style.setProperty('--header-color', currentEvent.textColor); // ヘッダーの色も指定色に
+            containerEl.style.setProperty('--header-color', currentEvent.textColor);
+        } else {
+            // textColorが指定されていない場合は、デフォルトの青を使用
+            containerEl.style.setProperty('--header-color', '#1a73e8'); 
         }
+
     }
     // 2. 背景色が指定されている場合
     else if (currentEvent.bgColor) {
