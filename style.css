@@ -9,6 +9,11 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    /* ===== 背景の transition を追加 ===== */
+    transition: background 0.5s ease;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
 .container {
@@ -19,7 +24,18 @@ body {
     width: 90%;
     max-width: 500px;
     text-align: center;
+    /* ===== 色の transition を追加 ===== */
+    transition: background-color 0.5s ease, color 0.5s ease, backdrop-filter 0.5s ease;
 }
+
+/* ===== 背景画像が設定された時のスタイルを追加 ===== */
+.container.bg-image-mode {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px); /* Safari対応 */
+    color: #333; /* 文字色は黒で見やすく */
+}
+
 
 header {
     margin-bottom: 1.5rem;
@@ -127,4 +143,61 @@ footer {
     text-align: center;
     font-size: 0.8rem;
     color: #999;
+}
+
+/* ===== 背景設定パネルのスタイルを追加 ===== */
+.background-controls {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    padding: 10px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-group label {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.upload-label {
+    background-color: #6c757d;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.upload-label:hover {
+    background-color: #5a6268;
+}
+
+#bg-reset-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.3s;
+}
+
+#bg-reset-button:hover {
+    background-color: #c82333;
 }
