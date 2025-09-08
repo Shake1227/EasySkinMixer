@@ -12,7 +12,7 @@ const EVENTS = [
         titleFont: 'Kaisei Tokumin', // タイトル用のフォント
         descriptionFont: 'Kaisei HarunoUmi', // 説明文用のフォント
         lock: false, // trueにするとこの企画にロックがかかる
-        lockSecret: 'CHANGE-THIS-SECRET-PHRASE', //企画ごとに異なる、秘密の言葉を設定
+        lockSecret: 'UNLOCK-CASINO-SUIT', //企画ごとに異なる、秘密の言葉を設定
     },
     // --- 新しい企画を追加する場合は、この下にコピーして追記 ---
     // {
