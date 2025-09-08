@@ -9,17 +9,42 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    transition: background 0.5s ease;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
 .container {
-    background-color: #fff;
+    /* CSS変数を定義。JSからこれらの値を変更する */
+    --container-bg: #fff;
+    --text-color: #333;
+    --header-color: #1a73e8; /* 企画名のデフォルト色（青）を変数化 */
+    --upload-area-bg: #fafafa;
+    --upload-area-border: #ccc;
+
+    background-color: var(--container-bg);
+    color: var(--text-color);
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 2rem;
     width: 90%;
     max-width: 500px;
     text-align: center;
+    transition: background-color 0.5s ease, color 0.5s ease, backdrop-filter 0.5s ease;
 }
+
+/* ===== 背景画像が設定された時のスタイル ===== */
+.container.bg-image-mode {
+    background-color: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+.upload-area.bg-image-mode {
+    background-color: rgba(255, 255, 255, 0.6) !important; /* 少し濃いめの半透明 */
+    border-color: rgba(255, 255, 255, 0.7) !important;
+}
+/* ===== =============================== ===== */
 
 header {
     margin-bottom: 1.5rem;
@@ -30,24 +55,25 @@ header {
 
 #event-name {
     font-size: 2rem;
-    color: #1a73e8;
+    color: var(--header-color); /* 青色固定をやめ、変数を使用 */
     margin-top: 15px;
     white-space: nowrap;
 }
 
 #event-logo {
-    max-width: 300px; 
+    max-width: 300px;
     max-height: 150px;
     background-color: white;
-    border-radius: 8px; 
+    border-radius: 8px;
 }
 
 .upload-area {
     margin: 1.5rem 0;
     padding: 2rem;
-    border: 2px dashed #ccc;
+    border: 2px dashed var(--upload-area-border);
     border-radius: 8px;
-    background-color: #fafafa;
+    background-color: var(--upload-area-bg);
+    transition: background-color 0.5s ease, border-color 0.5s ease; /* transitionを追加 */
 }
 
 .upload-button {
@@ -72,7 +98,7 @@ input[type="file"] {
 
 #file-name {
     margin-top: 1rem;
-    color: #666;
+    /* 色は .container の color を継承する */
     font-size: 0.9rem;
 }
 
