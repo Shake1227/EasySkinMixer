@@ -20,7 +20,7 @@ const EVENTS = [
         logo: 'http://www.floral-village.info/up/1757264384.png', // 企画ロゴのURL (なければ空文字)
         skin: './skins/casino_bunny.png', // 服装スキンのファイルパス
         bgImage: 'http://www.floral-village.info/up/1757334996.png',
-        textColor: 'ff69b4', // タイトルのカラー
+        textColor: '#ff69b4', // タイトルのカラー
         titleFont: 'Hachi Maru Pop', // タイトル用のフォント
         descriptionFont: 'Kaisei HarunoUmi', // 説明文用のフォント
         lock: false, // trueにするとこの企画にロックがかかる
