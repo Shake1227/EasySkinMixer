@@ -21,7 +21,7 @@ const EVENTS = [
         skin: './skins/casino_bunny.png', // 服装スキンのファイルパス
         bgImage: 'http://www.floral-village.info/up/1757334996.png',
         textColor: 'ff69b4', // タイトルのカラー
-        titleFont: 'Kaisei Tokumin', // タイトル用のフォント
+        titleFont: 'Hachi Maru Pop', // タイトル用のフォント
         descriptionFont: 'Kaisei HarunoUmi', // 説明文用のフォント
         lock: false, // trueにするとこの企画にロックがかかる
         lockSecret: 'UNLOCK-CASINO-BUNNY', //企画ごとに異なる、秘密の言葉を設定
