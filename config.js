@@ -26,7 +26,6 @@ const EVENTS = [
         lock: false, // trueにするとこの企画にロックがかかる
         lockSecret: 'UNLOCK-CASINO-BUNNY', //企画ごとに異なる、秘密の言葉を設定
     },
-
     {
         id: 'example', // 企画のID (URLに使われます。半角英数字で)
         name: 'サンプルページ（学校の制服）', // 企画名
