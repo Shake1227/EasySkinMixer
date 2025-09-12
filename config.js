@@ -23,7 +23,7 @@ const EVENTS = [
         textColor: '#ff69b4', // タイトルのカラー
         titleFont: 'Hachi Maru Pop', // タイトル用のフォント
         descriptionFont: 'Kaisei HarunoUmi', // 説明文用のフォント
-        lock: true, // trueにするとこの企画にロックがかかる
+        lock: false, // trueにするとこの企画にロックがかかる
         lockSecret: 'UNLOCK-CASINO-BUNNY', //企画ごとに異なる、秘密の言葉を設定
     },
     {
