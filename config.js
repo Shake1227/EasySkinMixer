@@ -18,7 +18,7 @@ const EVENTS = [
         id: 'casino_bunny', // 企画のID (URLに使われます。半角英数字で)
         name: 'inメンシ「バニー衣装」', // 企画名
         logo: 'http://www.floral-village.info/up/1757264384.png', // 企画ロゴのURL (なければ空文字)
-        skin: './skins/casino_bunny.png', // 服装スキンのファイルパス
+        skin: './skins/image.png', // 服装スキンのファイルパス
         bgImage: 'http://www.floral-village.info/up/1757334996.png',
         textColor: '#ff69b4', // タイトルのカラー
         titleFont: 'Hachi Maru Pop', // タイトル用のフォント
