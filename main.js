@@ -1,4 +1,3 @@
-// EasySkinMixer - Main Logic (バージョンFinal.11 - useAccessory 最終修正版)
 console.log("EasySkinMixer: useAccessoryロジックを修正した最終版のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -41,7 +40,7 @@ function showLockScreen(event) {
 
     unlockButton.onclick = async () => {
         const inputKey = keyInput.value.trim().toUpperCase();
-        if (inputKey === event.lockSecret) { // Simplified validation for example
+        if (inputKey === event.lockSecret) {
             errorMessage.textContent = '';
             keyInput.disabled = true;
             unlockButton.disabled = true;
@@ -148,7 +147,7 @@ function initializeMainContent(currentEvent) {
     const costumeImg = new Image();
     costumeImg.crossOrigin = "anonymous";
     costumeImg.src = currentEvent.skin;
-    costumeImg.onload = () => {}; // Ensure image is loaded before use
+    costumeImg.onload = () => {};
     costumeImg.onerror = () => { showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。'); };
 
     uploader.addEventListener('change', (e) => {
@@ -196,41 +195,25 @@ function initializeMainContent(currentEvent) {
         }
     }
     
-    // ★★ここからが修正点です★★
     function mixSkins(userSkin, costume) {
         skinCtx.clearRect(0, 0, 64, 64);
-
-        // --- レイヤー1: ベースとなる肌を描画 ---
         skinCtx.fillStyle = colorPicker.value;
-        // 1.8形式の1レイヤー目 Body Partsを正確に塗りつぶす
-        skinCtx.fillRect(16, 16, 24, 16); // 胴体
-        skinCtx.fillRect(40, 16, 16, 16); // 右腕
-        skinCtx.fillRect(0, 16, 16, 16);  // 右脚
-        if (costume.height === 64) { // 1.8形式の場合
-             skinCtx.fillRect(16, 48, 16, 16); // 左脚
-             skinCtx.fillRect(32, 48, 16, 16); // 左腕
+        skinCtx.fillRect(16, 16, 24, 16); 
+        skinCtx.fillRect(40, 16, 16, 16); 
+        skinCtx.fillRect(0, 16, 16, 16);  
+        if (costume.height === 64) {
+             skinCtx.fillRect(16, 48, 16, 16); 
+             skinCtx.fillRect(32, 48, 16, 16); 
         }
-
-        // --- レイヤー2: 衣装の「体」部分だけを重ねる ---
-        // これにより、衣装の透過部分からは下の肌色が見える
         skinCtx.drawImage(costume, 0, 16, 64, 48, 0, 16, 64, 48);
-        
-        // --- レイヤー3: ユーザーの頭を上書き描画 ---
-        // これで、衣装の頭がユーザーの頭に影響するのを防ぐ
         skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
-        
-        // --- レイヤー4: もしuseAccessoryがtrueなら、衣装の頭部分をさらに重ねる ---
         if (currentEvent.useAccessory === true) {
             skinCtx.drawImage(costume, 0, 0, 64, 16, 0, 0, 64, 16);
         }
-
-        // --- 最終処理 ---
         const mixedSkinUrl = skinCanvas.toDataURL('image/png');
         downloadButton.href = mixedSkinUrl;
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
     }
-    // ★★ここまでが修正点です★★
-
     function drawPreview(sourceCanvas) {
         const scale = 10;
         previewCanvas.width = 16 * scale;
