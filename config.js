@@ -29,6 +29,16 @@ const EVENTS = [
         useAccessory: false,
     },
     {
+        id: 'cave_explorer',
+        name: '洞窟しかない世界で全員集合',
+        skin: './skins/cave_explorer.png',
+        bgImage: 'http://www.floral-village.info/up/1757373978.png',
+        textColor: '#000000',
+        lock: false,
+        lockSecret: 'UNLOCK-CASINO-SUIT',
+        useAccessory: true,
+    },
+    {
         id: 'example',
         name: 'サンプルページ（学校の制服）',
         skin: './skins/example.png',
