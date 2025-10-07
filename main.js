@@ -1,4 +1,4 @@
-// EasySkinMixer - Main Logic (バージョンFinal.9 - レイヤー構造再現 最終修正版)
+// EasySkinMixer - Main Logic (バージョンFinal.10 - レイヤー構造再現 最終修正版)
 console.log("EasySkinMixer: レイヤー構造再現 最終修正版のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -200,28 +200,28 @@ function initializeMainContent(currentEvent) {
         skinCtx.clearRect(0, 0, 64, 64);
 
         // --- レイヤー1: 肌の描画 ---
-        // 選択された肌色で、1レイヤー目の体の部分だけを塗りつぶす
+        // 選択された肌色で、1レイヤー目の体の部分だけを正確に塗りつぶす
         skinCtx.fillStyle = colorPicker.value;
-        // 1.8形式の1レイヤー目 Body Parts
-        skinCtx.fillRect(16, 16, 24, 16); // 胴体と腕(右)のエリア
-        skinCtx.fillRect(0, 16, 16, 16);  // 脚(右)のエリア
-        skinCtx.fillRect(16, 48, 16, 16); // 脚(左)のエリア
-        skinCtx.fillRect(32, 48, 16, 16); // 腕(左)のエリア
+        // 体
+        skinCtx.fillRect(16, 16, 24, 16); // 胴体と、旧式の腕が配置されていたエリア
+        skinCtx.fillRect(0, 16, 16, 16);  // 右脚 (旧式)
+        
+        // 1.8形式で追加されたパーツのエリア
+        if (costume.height === 64) {
+             skinCtx.fillRect(16, 48, 16, 16); // 左脚
+             skinCtx.fillRect(32, 48, 16, 16); // 左腕
+             skinCtx.fillRect(40, 16, 16, 16); // 右腕
+        }
 
-        // --- レイヤー2: ユーザーの頭を描画 ---
-        skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
-
-        // --- レイヤー3: 衣装スキンを重ねる ---
+        // --- レイヤー2: 衣装スキンを重ねる ---
         skinCtx.drawImage(costume, 0, 0);
         
-        // --- レイヤー4: 頭の最終処理 ---
+        // --- レイヤー3: ユーザーの頭を上書き描画 ---
+        skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
+        
+        // --- レイヤー4: もし企画でuseAccessoryがtrueなら、衣装の頭部分をさらに重ねる ---
         if (currentEvent.useAccessory === true) {
-            // アクセサリを使う場合: ユーザーの頭(レイヤー1&2)の上に、衣装の頭(レイヤー1&2)を重ねる
-            skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
             skinCtx.drawImage(costume, 0, 0, 64, 16, 0, 0, 64, 16);
-        } else {
-            // アクセサリを使わない場合: 衣装で上書きされた頭を、ユーザーの頭で再度上書きして戻す
-            skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
         }
 
         // --- 最終処理 ---
