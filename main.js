@@ -1,5 +1,5 @@
-// EasySkinMixer - Main Logic (バージョンFinal.10 - レイヤー構造再現 最終修正版)
-console.log("EasySkinMixer: レイヤー構造再現 最終修正版のスクリプトを読み込みました。");
+// EasySkinMixer - Main Logic (バージョンFinal.11 - useAccessory 最終修正版)
+console.log("EasySkinMixer: useAccessoryロジックを修正した最終版のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
@@ -148,6 +148,7 @@ function initializeMainContent(currentEvent) {
     const costumeImg = new Image();
     costumeImg.crossOrigin = "anonymous";
     costumeImg.src = currentEvent.skin;
+    costumeImg.onload = () => {}; // Ensure image is loaded before use
     costumeImg.onerror = () => { showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。'); };
 
     uploader.addEventListener('change', (e) => {
@@ -199,27 +200,26 @@ function initializeMainContent(currentEvent) {
     function mixSkins(userSkin, costume) {
         skinCtx.clearRect(0, 0, 64, 64);
 
-        // --- レイヤー1: 肌の描画 ---
-        // 選択された肌色で、1レイヤー目の体の部分だけを正確に塗りつぶす
+        // --- レイヤー1: ベースとなる肌を描画 ---
         skinCtx.fillStyle = colorPicker.value;
-        // 体
-        skinCtx.fillRect(16, 16, 24, 16); // 胴体と、旧式の腕が配置されていたエリア
-        skinCtx.fillRect(0, 16, 16, 16);  // 右脚 (旧式)
-        
-        // 1.8形式で追加されたパーツのエリア
-        if (costume.height === 64) {
+        // 1.8形式の1レイヤー目 Body Partsを正確に塗りつぶす
+        skinCtx.fillRect(16, 16, 24, 16); // 胴体
+        skinCtx.fillRect(40, 16, 16, 16); // 右腕
+        skinCtx.fillRect(0, 16, 16, 16);  // 右脚
+        if (costume.height === 64) { // 1.8形式の場合
              skinCtx.fillRect(16, 48, 16, 16); // 左脚
              skinCtx.fillRect(32, 48, 16, 16); // 左腕
-             skinCtx.fillRect(40, 16, 16, 16); // 右腕
         }
 
-        // --- レイヤー2: 衣装スキンを重ねる ---
-        skinCtx.drawImage(costume, 0, 0);
+        // --- レイヤー2: 衣装の「体」部分だけを重ねる ---
+        // これにより、衣装の透過部分からは下の肌色が見える
+        skinCtx.drawImage(costume, 0, 16, 64, 48, 0, 16, 64, 48);
         
         // --- レイヤー3: ユーザーの頭を上書き描画 ---
+        // これで、衣装の頭がユーザーの頭に影響するのを防ぐ
         skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
         
-        // --- レイヤー4: もし企画でuseAccessoryがtrueなら、衣装の頭部分をさらに重ねる ---
+        // --- レイヤー4: もしuseAccessoryがtrueなら、衣装の頭部分をさらに重ねる ---
         if (currentEvent.useAccessory === true) {
             skinCtx.drawImage(costume, 0, 0, 64, 16, 0, 0, 64, 16);
         }
