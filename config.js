@@ -13,7 +13,7 @@ const EVENTS = [
         descriptionFont: 'Kaisei HarunoUmi', // 説明文フォント
         lock: true, // ロックの有無
         lockSecret: 'UNLOCK-CASINO-SUIT', // 暗号キーの元
-        useAccessory: false // trueにすると衣装の頭パーツを合成する
+        useAccessory: false, // trueにすると衣装の頭パーツを合成する
     },
     {
         id: 'casino_bunny',
@@ -26,7 +26,7 @@ const EVENTS = [
         descriptionFont: 'Kaisei HarunoUmi',
         lock: true,
         lockSecret: 'UNLOCK-CASINO-BUNNY',
-        useAccessory: false
+        useAccessory: false,
     },
     {
         id: 'example',
@@ -36,7 +36,7 @@ const EVENTS = [
         textColor: '#000000',
         lock: false,
         lockSecret: 'UNLOCK-CASINO-SUIT',
-        useAccessory: false
+        useAccessory: false,
     },
     // --- 新しい企画を追加する場合は、この下にコピーして追記 ---
     // {
