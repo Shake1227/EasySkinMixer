@@ -1,5 +1,5 @@
-// EasySkinMixer - Main Logic (バージョンFinal.4 - 超々高精度 肌色適用版)
-console.log("EasySkinMixer: 超々高精度 肌色適用版のスクリプトを読み込みました。");
+// EasySkinMixer - Main Logic (バージョンFinal.5 - レイヤー構造再現版)
+console.log("EasySkinMixer: レイヤー構造再現版のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
@@ -41,7 +41,7 @@ function showLockScreen(event) {
 
     unlockButton.onclick = async () => {
         const inputKey = keyInput.value.trim().toUpperCase();
-        if (inputKey === event.lockSecret) {
+        if (inputKey === event.lockSecret) { // Simplified validation
             errorMessage.textContent = '';
             keyInput.disabled = true;
             unlockButton.disabled = true;
@@ -201,7 +201,7 @@ function initializeMainContent(currentEvent) {
 
         // 1. 選択された肌色で、体の部分（頭以外）を一面に描画
         skinCtx.fillStyle = colorPicker.value;
-        skinCtx.fillRect(0, 16, 64, 48); // 体、腕、脚の領域
+        skinCtx.fillRect(0, 16, 64, 48);
 
         // 2. その上に衣装スキンを重ねて描画する
         // これにより、衣装スキンの透過部分からは下の肌色が見える
