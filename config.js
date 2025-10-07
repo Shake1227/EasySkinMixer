@@ -3,40 +3,40 @@
 
 const EVENTS = [
     {
-        id: 'casino_suit', // 企画のID (URLに使われます。半角英数字で)
+        id: 'casino_suit', // 企画のID
         name: 'inメンシ「スーツ」', // 企画名
-        logo: 'http://www.floral-village.info/up/1757264384.png', // 企画ロゴのURL (なければ空文字)
-        skin: './skins/casino_suit.png', // 服装スキンのファイルパス
-        bgImage: 'http://www.floral-village.info/up/1757334996.png',
-        textColor: '#000000', // タイトルのカラー
-        titleFont: 'Kaisei Tokumin', // タイトル用のフォント
-        descriptionFont: 'Kaisei HarunoUmi', // 説明文用のフォント
-        lock: true, // trueにするとこの企画にロックがかかる
-        lockSecret: 'UNLOCK-CASINO-SUIT', //企画ごとに異なる、秘密の言葉を設定
+        logo: 'http://www.floral-village.info/up/1757264384.png', // ロゴURL
+        skin: './skins/casino_suit.png', // 衣装スキン
+        bgImage: 'http://www.floral-village.info/up/1757334996.png', // 背景画像
+        textColor: '#000000', // タイトル色
+        titleFont: 'Kaisei Tokumin', // タイトルフォント
+        descriptionFont: 'Kaisei HarunoUmi', // 説明文フォント
+        lock: true, // ロックの有無
+        lockSecret: 'UNLOCK-CASINO-SUIT', // 暗号キーの元
+        useAccessory: false // trueにすると衣装の頭パーツを合成する
     },
     {
-        id: 'casino_bunny', // 企画のID (URLに使われます。半角英数字で)
-        name: 'inメンシ「バニー衣装」', // 企画名
-        logo: 'http://www.floral-village.info/up/1757264384.png', // 企画ロゴのURL (なければ空文字)
-        skin: './skins/image.png', // 服装スキンのファイルパス
+        id: 'casino_bunny',
+        name: 'inメンシ「バニー衣装」',
+        logo: 'http://www.floral-village.info/up/1757264384.png',
+        skin: './skins/image.png',
         bgImage: 'http://www.floral-village.info/up/1757334996.png',
-        textColor: '#ff69b4', // タイトルのカラー
-        titleFont: 'Hachi Maru Pop', // タイトル用のフォント
-        descriptionFont: 'Kaisei HarunoUmi', // 説明文用のフォント
-        lock: true, // trueにするとこの企画にロックがかかる
-        lockSecret: 'UNLOCK-CASINO-BUNNY', //企画ごとに異なる、秘密の言葉を設定
+        textColor: '#ff69b4',
+        titleFont: 'Hachi Maru Pop',
+        descriptionFont: 'Kaisei HarunoUmi',
+        lock: true,
+        lockSecret: 'UNLOCK-CASINO-BUNNY',
+        useAccessory: false
     },
     {
-        id: 'example', // 企画のID (URLに使われます。半角英数字で)
-        name: 'サンプルページ（学校の制服）', // 企画名
-        // logo: '', // 企画ロゴのURL (なければ空文字)
-        skin: './skins/example.png', // 服装スキンのファイルパス
+        id: 'example',
+        name: 'サンプルページ（学校の制服）',
+        skin: './skins/example.png',
         bgImage: 'http://www.floral-village.info/up/1757373978.png',
-        textColor: '#000000', // タイトルのカラー
-        // titleFont: 'Kaisei Tokumin', // タイトル用のフォント
-        // descriptionFont: 'Kaisei HarunoUmi', // 説明文用のフォント
-        lock: false, // trueにするとこの企画にロックがかかる
-        lockSecret: 'UNLOCK-CASINO-SUIT', //企画ごとに異なる、秘密の言葉を設定
+        textColor: '#000000',
+        lock: false,
+        lockSecret: 'UNLOCK-CASINO-SUIT',
+        useAccessory: false
     },
     // --- 新しい企画を追加する場合は、この下にコピーして追記 ---
     // {
@@ -51,6 +51,7 @@ const EVENTS = [
     //     descriptionFont: 'Kaisei Opti',
     //     lock: true,
     //     lockSecret: 'ANOTHER-UNIQUE-SECRET',
+    //     useAccessory: false // trueにすると衣装の頭パーツを合成する
     // }
     // ---------------------------------------------------------
 ];
