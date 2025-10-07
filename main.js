@@ -1,4 +1,4 @@
-// EasySkinMixer - Main Logic (バージョンFinal.8 - レイヤー構造再現 最終修正版)
+// EasySkinMixer - Main Logic (バージョンFinal.9 - レイヤー構造再現 最終修正版)
 console.log("EasySkinMixer: レイヤー構造再現 最終修正版のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -202,28 +202,26 @@ function initializeMainContent(currentEvent) {
         // --- レイヤー1: 肌の描画 ---
         // 選択された肌色で、1レイヤー目の体の部分だけを塗りつぶす
         skinCtx.fillStyle = colorPicker.value;
-        // 体
-        skinCtx.fillRect(16, 20, 24, 12); // 胴体と腕
-        skinCtx.fillRect(20, 16, 16, 4);  // 胴体と腕の上下
-        // 脚
-        skinCtx.fillRect(0, 20, 16, 12);   // 右脚
-        skinCtx.fillRect(4, 16, 8, 4);    // 右脚の上下
-        if (costume.height === 64) { // 1.8形式
-            skinCtx.fillRect(16, 52, 16, 12); // 左脚
-            skinCtx.fillRect(20, 48, 8, 4);   // 左脚の上下
-        }
+        // 1.8形式の1レイヤー目 Body Parts
+        skinCtx.fillRect(16, 16, 24, 16); // 胴体と腕(右)のエリア
+        skinCtx.fillRect(0, 16, 16, 16);  // 脚(右)のエリア
+        skinCtx.fillRect(16, 48, 16, 16); // 脚(左)のエリア
+        skinCtx.fillRect(32, 48, 16, 16); // 腕(左)のエリア
 
         // --- レイヤー2: ユーザーの頭を描画 ---
         skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
 
         // --- レイヤー3: 衣装スキンを重ねる ---
-        // これにより、衣装の透過部分からは下の肌色や頭が見える
         skinCtx.drawImage(costume, 0, 0);
         
-        // --- レイヤー4: もし企画でuseAccessoryがtrueなら、衣装の頭部分をさらに重ねる ---
+        // --- レイヤー4: 頭の最終処理 ---
         if (currentEvent.useAccessory === true) {
-            // 衣装の頭1レイヤー目と2レイヤー目の両方を、ユーザーの頭の上に描画する
+            // アクセサリを使う場合: ユーザーの頭(レイヤー1&2)の上に、衣装の頭(レイヤー1&2)を重ねる
+            skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
             skinCtx.drawImage(costume, 0, 0, 64, 16, 0, 0, 64, 16);
+        } else {
+            // アクセサリを使わない場合: 衣装で上書きされた頭を、ユーザーの頭で再度上書きして戻す
+            skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
         }
 
         // --- 最終処理 ---
