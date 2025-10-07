@@ -1,5 +1,5 @@
-// EasySkinMixer - Main Logic (バージョンFinal.2 - 高精度 肌色適用版)
-console.log("EasySkinMixer: 高精度 肌色適用版のスクリプトを読み込みました。");
+// EasySkinMixer - Main Logic (バージョンFinal.3 - 超高精度 肌色適用版)
+console.log("EasySkinMixer: 超高精度 肌色適用版のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
@@ -41,7 +41,6 @@ function showLockScreen(event) {
 
     unlockButton.onclick = async () => {
         const inputKey = keyInput.value.trim().toUpperCase();
-        
         // This is a simplified validation for the example. 
         // A real implementation would require a more robust key generation/validation system.
         if (inputKey === event.lockSecret) {
@@ -209,74 +208,47 @@ function initializeMainContent(currentEvent) {
     
     // ★★ここからが修正点です★★
     function mixSkins(userSkin, costume) {
-        // 1. 一時的なCanvasを用意
+        // 1. 最終出力用のCanvasをクリア
+        skinCtx.clearRect(0, 0, 64, 64);
+    
+        // 2. 選択された肌色で、体の部分（頭以外）を一面に描画
+        skinCtx.fillStyle = colorPicker.value;
+        skinCtx.fillRect(0, 16, 64, 48); // 体、腕、脚の領域
+    
+        // 3. 一時的なCanvasを作成し、衣装スキンを描画
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = 64;
         tempCanvas.height = 64;
         const tempCtx = tempCanvas.getContext('2d');
-
-        // 2. 衣装スキンを描画し、ピクセルデータを取得
         tempCtx.drawImage(costume, 0, 0);
+    
+        // 4. 衣装スキンのピクセルデータを取得
         const costumeData = tempCtx.getImageData(0, 0, 64, 64);
         const pixels = costumeData.data;
-
-        // 3. 選択された肌色をRGBに変換
-        const skinColor = colorPicker.value;
-        const r = parseInt(skinColor.slice(1, 3), 16);
-        const g = parseInt(skinColor.slice(3, 5), 16);
-        const b = parseInt(skinColor.slice(5, 7), 16);
-
-        // 4. マインクラフトスキンの体の部分の範囲を定義
-        const bodyParts = [
-            // layer 1
-            { x: 16, y: 16, w: 24, h: 16 }, // body + arms
-            { x: 0, y: 16, w: 16, h: 16 }, // right leg
-        ];
-        if (costume.height === 64) { // 1.8+ format
-            bodyParts.push({ x: 16, y: 48, w: 32, h: 16 }); // left leg + left arm
-        }
-
-
-        // 5. ピクセルを1つずつチェック
+    
+        // 5. 完全に透明ではないピクセルだけを、肌色の上に重ねる
         for (let i = 0; i < pixels.length; i += 4) {
             const alpha = pixels[i + 3];
-            
-            // ピクセルが完全に透明の場合
-            if (alpha === 0) {
+    
+            // ピクセルが少しでも色を持っていれば（＝完全に透明でなければ）
+            if (alpha > 0) {
                 const x = (i / 4) % 64;
                 const y = Math.floor((i / 4) / 64);
-
-                // そのピクセルが体のパーツ範囲内かチェック
-                let isBodyPart = false;
-                for (const part of bodyParts) {
-                    if (x >= part.x && x < part.x + part.w && y >= part.y && y < part.y + part.h) {
-                        isBodyPart = true;
-                        break;
-                    }
-                }
-
-                // 体のパーツ範囲内なら肌色で塗りつぶす
-                if (isBodyPart) {
-                    pixels[i] = r;
-                    pixels[i + 1] = g;
-                    pixels[i + 2] = b;
-                    pixels[i + 3] = 255; // 不透明にする
-                }
+                
+                // そのピクセルを最終的なCanvasに描画
+                skinCtx.fillStyle = `rgba(${pixels[i]}, ${pixels[i+1]}, ${pixels[i+2]}, ${alpha/255})`;
+                skinCtx.fillRect(x, y, 1, 1);
             }
         }
-
-        // 6. 最終的なCanvasをクリアし、加工した画像を転写
-        skinCtx.clearRect(0, 0, 64, 64);
-        skinCtx.putImageData(costumeData, 0, 0);
-
-        // 7. ユーザーの頭と、企画の頭アクセサリーを合成
+    
+        // 6. ユーザーの頭と、企画の頭アクセサリーを合成
         skinCtx.clearRect(0, 0, 64, 16);
         skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
         if (currentEvent.useAccessory === true) {
             skinCtx.drawImage(costume, 0, 0, 64, 16, 0, 0, 64, 16);
         }
-
-        // 8. ダウンロードリンクを更新
+    
+        // 7. ダウンロードリンクを更新
         const mixedSkinUrl = skinCanvas.toDataURL('image/png');
         downloadButton.href = mixedSkinUrl;
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
