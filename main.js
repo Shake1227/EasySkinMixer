@@ -1,5 +1,5 @@
-// EasySkinMixer - Main Logic (バージョンFinal.6 - レイヤー構造再現版)
-console.log("EasySkinMixer: レイヤー構造再現版のスクリプトを読み込みました。");
+// EasySkinMixer - Main Logic (バージョンFinal.7 - レイヤー構造再現 最終修正版)
+console.log("EasySkinMixer: レイヤー構造再現 最終修正版のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
@@ -41,7 +41,7 @@ function showLockScreen(event) {
 
     unlockButton.onclick = async () => {
         const inputKey = keyInput.value.trim().toUpperCase();
-        if (inputKey === event.lockSecret) { // Simplified validation
+        if (inputKey === event.lockSecret) { // Simplified validation for example
             errorMessage.textContent = '';
             keyInput.disabled = true;
             unlockButton.disabled = true;
@@ -200,18 +200,21 @@ function initializeMainContent(currentEvent) {
         skinCtx.clearRect(0, 0, 64, 64);
 
         // 1. 肌色の「体」とユーザーの「頭」で土台となるスキンを作成
+        // 1レイヤー目の体の部分だけを肌色で塗りつぶす
         skinCtx.fillStyle = colorPicker.value;
-        skinCtx.fillRect(0, 16, 64, 16); // 体・腕の領域
-        skinCtx.fillRect(0, 48, 64, 16); // 脚の領域 (1.8形式)
-        skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16); // ユーザーの頭
+        skinCtx.fillRect(16, 16, 24, 16); // 胴体と腕
+        skinCtx.fillRect(0, 16, 16, 16);  // 右脚 (旧式。1.8でもこの範囲は有効)
+        skinCtx.fillRect(0, 32, 32, 16);  // 左脚 (1.8形式)
+
+        // ユーザーの頭をそのまま描画（1, 2レイヤー目両方）
+        skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
 
         // 2. その上に衣装スキンを重ねて描画する
-        // これにより、衣装の透過部分からは下の肌色や頭が見える
         skinCtx.drawImage(costume, 0, 0);
         
-        // 3. もし企画でuseAccessoryがtrueなら、衣装の頭部分をさらに重ねる
+        // 3. 最後に、もし企画でuseAccessoryがtrueなら、衣装の頭の2レイヤー目"だけ"を重ねる
         if (currentEvent.useAccessory === true) {
-            skinCtx.drawImage(costume, 32, 0, 32, 16, 32, 0, 32, 16); // 頭の2レイヤー目だけを上書き
+            skinCtx.drawImage(costume, 32, 0, 32, 16, 32, 0, 32, 16);
         }
 
         // 4. ダウンロードリンクを更新
