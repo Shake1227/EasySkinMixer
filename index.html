@@ -11,9 +11,7 @@
 
     <div id="lock-screen" style="display: none;">
         <div class="lock-container">
-            <div id="lock-icon-area">
-                <i id="lock-icon" class="fas fa-lock"></i>
-            </div>
+            <div id="lock-icon-area"><i id="lock-icon" class="fas fa-lock"></i></div>
             <h2>認証が必要です</h2>
             <p>暗号キーを入力してください</p>
             <input type="text" id="key-input" placeholder="例: CS-XXXX-XXXX-XXXX">
@@ -29,16 +27,12 @@
             <div class="loading-content top">
                 <div class="progress-container">
                     <span id="progress-percent">0%</span>
-                    <div class="progress-bar-background">
-                        <div id="progress-bar"></div>
-                    </div>
+                    <div class="progress-bar-background"><div id="progress-bar"></div></div>
                 </div>
             </div>
         </div>
         <div id="loading-gate-bottom">
-            <div class="loading-content bottom">
-                 <h2 id="loading-text">Enjoy your skin life!</h2>
-            </div>
+            <div class="loading-content bottom"><h2 id="loading-text">Enjoy your skin life!</h2></div>
         </div>
     </div>
 
@@ -49,14 +43,20 @@
         </header>
         <div id="mixer-ui">
             <p id="description">下のボタンからあなたのスキンをアップロードして、限定スキンと合成しよう！</p>
+            
             <div class="upload-area">
-                <label for="user-skin-upload" class="upload-button">
-                    自分のスキンを選択
+                <div class="upload-control">
+                    <label for="user-skin-upload" class="upload-button">自分のスキンを選択</label>
                     <input type="file" id="user-skin-upload" accept="image/png">
-                </label>
-                <p id="file-name">ファイルが選択されていません</p>
+                    <p id="file-name">ファイルが選択されていません</p>
+                </div>
+                <div class="color-control">
+                    <label for="skin-color-picker" class="color-label">肌色を選択</label>
+                    <input type="color" id="skin-color-picker" value="#ffdfc8">
+                </div>
             </div>
-            <div id="preview-area" style="display: none;">
+            
+            <div id="preview-area">
                 <h2>プレビュー</h2>
                 <canvas id="preview-canvas"></canvas>
                 <canvas id="skin-canvas" width="64" height="64" style="display: none;"></canvas>
