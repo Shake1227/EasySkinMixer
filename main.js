@@ -1,4 +1,4 @@
-console.log("EasySkinMixer: useAccessoryロジックを修正した最終版のスクリプトを読み込みました。");
+console.log("EasySkinMixer: スクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
