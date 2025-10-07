@@ -1,4 +1,4 @@
-// EasySkinMixer - Main Logic (バージョンFinal.7 - レイヤー構造再現 最終修正版)
+// EasySkinMixer - Main Logic (バージョンFinal.8 - レイヤー構造再現 最終修正版)
 console.log("EasySkinMixer: レイヤー構造再現 最終修正版のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -199,25 +199,34 @@ function initializeMainContent(currentEvent) {
     function mixSkins(userSkin, costume) {
         skinCtx.clearRect(0, 0, 64, 64);
 
-        // 1. 肌色の「体」とユーザーの「頭」で土台となるスキンを作成
-        // 1レイヤー目の体の部分だけを肌色で塗りつぶす
+        // --- レイヤー1: 肌の描画 ---
+        // 選択された肌色で、1レイヤー目の体の部分だけを塗りつぶす
         skinCtx.fillStyle = colorPicker.value;
-        skinCtx.fillRect(16, 16, 24, 16); // 胴体と腕
-        skinCtx.fillRect(0, 16, 16, 16);  // 右脚 (旧式。1.8でもこの範囲は有効)
-        skinCtx.fillRect(0, 32, 32, 16);  // 左脚 (1.8形式)
-
-        // ユーザーの頭をそのまま描画（1, 2レイヤー目両方）
-        skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
-
-        // 2. その上に衣装スキンを重ねて描画する
-        skinCtx.drawImage(costume, 0, 0);
-        
-        // 3. 最後に、もし企画でuseAccessoryがtrueなら、衣装の頭の2レイヤー目"だけ"を重ねる
-        if (currentEvent.useAccessory === true) {
-            skinCtx.drawImage(costume, 32, 0, 32, 16, 32, 0, 32, 16);
+        // 体
+        skinCtx.fillRect(16, 20, 24, 12); // 胴体と腕
+        skinCtx.fillRect(20, 16, 16, 4);  // 胴体と腕の上下
+        // 脚
+        skinCtx.fillRect(0, 20, 16, 12);   // 右脚
+        skinCtx.fillRect(4, 16, 8, 4);    // 右脚の上下
+        if (costume.height === 64) { // 1.8形式
+            skinCtx.fillRect(16, 52, 16, 12); // 左脚
+            skinCtx.fillRect(20, 48, 8, 4);   // 左脚の上下
         }
 
-        // 4. ダウンロードリンクを更新
+        // --- レイヤー2: ユーザーの頭を描画 ---
+        skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
+
+        // --- レイヤー3: 衣装スキンを重ねる ---
+        // これにより、衣装の透過部分からは下の肌色や頭が見える
+        skinCtx.drawImage(costume, 0, 0);
+        
+        // --- レイヤー4: もし企画でuseAccessoryがtrueなら、衣装の頭部分をさらに重ねる ---
+        if (currentEvent.useAccessory === true) {
+            // 衣装の頭1レイヤー目と2レイヤー目の両方を、ユーザーの頭の上に描画する
+            skinCtx.drawImage(costume, 0, 0, 64, 16, 0, 0, 64, 16);
+        }
+
+        // --- 最終処理 ---
         const mixedSkinUrl = skinCanvas.toDataURL('image/png');
         downloadButton.href = mixedSkinUrl;
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
