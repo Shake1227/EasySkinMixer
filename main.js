@@ -1,5 +1,5 @@
-// EasySkinMixer - Main Logic (バージョンFinal.3 - 超高精度 肌色適用版)
-console.log("EasySkinMixer: 超高精度 肌色適用版のスクリプトを読み込みました。");
+// EasySkinMixer - Main Logic (バージョンFinal.4 - 超々高精度 肌色適用版)
+console.log("EasySkinMixer: 超々高精度 肌色適用版のスクリプトを読み込みました。");
 
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
@@ -41,29 +41,20 @@ function showLockScreen(event) {
 
     unlockButton.onclick = async () => {
         const inputKey = keyInput.value.trim().toUpperCase();
-        // This is a simplified validation for the example. 
-        // A real implementation would require a more robust key generation/validation system.
         if (inputKey === event.lockSecret) {
             errorMessage.textContent = '';
             keyInput.disabled = true;
             unlockButton.disabled = true;
-
             lockIcon.classList.remove('fa-lock');
             lockIcon.classList.add('fa-lock-open');
-            
-            await new Promise(resolve => setTimeout(resolve, 600)); 
-
+            await new Promise(resolve => setTimeout(resolve, 600));
             whiteFadeOverlay.classList.add('visible');
             await new Promise(resolve => setTimeout(resolve, 600));
-
             lockScreen.classList.remove('visible');
             setTimeout(() => lockScreen.style.display = 'none', 500);
-
             setCookie(`unlocked-${event.id}`, 'true', 365);
             startLoadingAnimation();
-            
             setTimeout(() => whiteFadeOverlay.classList.remove('visible'), 500);
-
         } else {
             errorMessage.textContent = '暗号キーが正しくありません。';
         }
@@ -121,7 +112,6 @@ function initializeMainContent(currentEvent) {
     const skinCtx = skinCanvas.getContext('2d');
     const previewCtx = previewCanvas.getContext('2d');
     const loadedFonts = new Set();
-
     let uploadedUserSkin = null;
 
     function loadGoogleFont(fontName) {
@@ -141,7 +131,6 @@ function initializeMainContent(currentEvent) {
         loadGoogleFont(currentEvent.descriptionFont);
         descriptionEl.style.fontFamily = `'${currentEvent.descriptionFont}', sans-serif`;
     }
-    
     if (currentEvent.bgImage) {
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
         containerEl.classList.add('bg-image-mode');
@@ -194,61 +183,39 @@ function initializeMainContent(currentEvent) {
     }
 
     function updateContainerColor(hex, textColor) {
-        const r = parseInt(hex.substr(1,2),16), g = parseInt(hex.substr(3,2),16), b = parseInt(hex.substr(5,2),16);
-        const yiq = ((r*299)+(g*587)+(b*114))/1000;
-        const finalTextColor = textColor ? textColor : (yiq >= 128 ? '#333' : '#f8f9fa');
-        containerEl.style.setProperty('--header-color', finalTextColor);
-        containerEl.style.setProperty('--text-color', finalTextColor);
-        if (yiq < 128) {
-            containerEl.style.setProperty('--container-bg', 'rgba(255,255,255,0.1)');
-            containerEl.style.setProperty('--upload-area-bg', 'rgba(255,255,255,0.05)');
-            containerEl.style.setProperty('--upload-area-border', 'rgba(255,255,255,0.2)');
+        const r=parseInt(hex.substr(1,2),16),g=parseInt(hex.substr(3,2),16),b=parseInt(hex.substr(5,2),16);
+        const yiq=((r*299)+(g*587)+(b*114))/1000;
+        const finalTextColor=textColor?textColor:(yiq>=128?'#333':'#f8f9fa');
+        containerEl.style.setProperty('--header-color',finalTextColor);
+        containerEl.style.setProperty('--text-color',finalTextColor);
+        if(yiq<128){
+            containerEl.style.setProperty('--container-bg','rgba(255,255,255,0.1)');
+            containerEl.style.setProperty('--upload-area-bg','rgba(255,255,255,0.05)');
+            containerEl.style.setProperty('--upload-area-border','rgba(255,255,255,0.2)');
         }
     }
     
     // ★★ここからが修正点です★★
     function mixSkins(userSkin, costume) {
-        // 1. 最終出力用のCanvasをクリア
         skinCtx.clearRect(0, 0, 64, 64);
-    
-        // 2. 選択された肌色で、体の部分（頭以外）を一面に描画
+
+        // 1. 選択された肌色で、体の部分（頭以外）を一面に描画
         skinCtx.fillStyle = colorPicker.value;
         skinCtx.fillRect(0, 16, 64, 48); // 体、腕、脚の領域
-    
-        // 3. 一時的なCanvasを作成し、衣装スキンを描画
-        const tempCanvas = document.createElement('canvas');
-        tempCanvas.width = 64;
-        tempCanvas.height = 64;
-        const tempCtx = tempCanvas.getContext('2d');
-        tempCtx.drawImage(costume, 0, 0);
-    
-        // 4. 衣装スキンのピクセルデータを取得
-        const costumeData = tempCtx.getImageData(0, 0, 64, 64);
-        const pixels = costumeData.data;
-    
-        // 5. 完全に透明ではないピクセルだけを、肌色の上に重ねる
-        for (let i = 0; i < pixels.length; i += 4) {
-            const alpha = pixels[i + 3];
-    
-            // ピクセルが少しでも色を持っていれば（＝完全に透明でなければ）
-            if (alpha > 0) {
-                const x = (i / 4) % 64;
-                const y = Math.floor((i / 4) / 64);
-                
-                // そのピクセルを最終的なCanvasに描画
-                skinCtx.fillStyle = `rgba(${pixels[i]}, ${pixels[i+1]}, ${pixels[i+2]}, ${alpha/255})`;
-                skinCtx.fillRect(x, y, 1, 1);
-            }
-        }
-    
-        // 6. ユーザーの頭と、企画の頭アクセサリーを合成
-        skinCtx.clearRect(0, 0, 64, 16);
+
+        // 2. その上に衣装スキンを重ねて描画する
+        // これにより、衣装スキンの透過部分からは下の肌色が見える
+        skinCtx.drawImage(costume, 0, 0);
+
+        // 3. ユーザーの頭を描画
         skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
+        
+        // 4. もし企画でuseAccessoryがtrueなら、衣装の頭部分をさらに重ねる
         if (currentEvent.useAccessory === true) {
             skinCtx.drawImage(costume, 0, 0, 64, 16, 0, 0, 64, 16);
         }
-    
-        // 7. ダウンロードリンクを更新
+
+        // 5. ダウンロードリンクを更新
         const mixedSkinUrl = skinCanvas.toDataURL('image/png');
         downloadButton.href = mixedSkinUrl;
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
@@ -272,8 +239,8 @@ function initializeMainContent(currentEvent) {
     function showError(message) {
         const mixerUi = document.getElementById('mixer-ui');
         const loadingMsg = document.getElementById('loading-message');
-        if (mixerUi) mixerUi.style.display = 'none';
-        if (loadingMsg) loadingMsg.style.display = 'none';
+        if(mixerUi) mixerUi.style.display = 'none';
+        if(loadingMsg) loadingMsg.style.display = 'none';
         errorMessageEl.textContent = message;
     }
 }
