@@ -49,7 +49,7 @@ const EVENTS = [
         useAccessory: true,
     },
     {
-        id: 'xmas',
+        id: 'xmas_santa',
         name: 'サンタクローススキン',
         skin: './skins/xmas.png',
         bgImage: 'http://www.floral-village.info/up/1757373978.png',
