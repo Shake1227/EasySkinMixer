@@ -49,6 +49,16 @@ const EVENTS = [
         useAccessory: true,
     },
     {
+        id: 'xmas',
+        name: 'サンタクローススキン',
+        skin: './skins/xmas.png',
+        bgImage: 'http://www.floral-village.info/up/1757373978.png',
+        textColor: '#f56464',
+        lock: false,
+        lockSecret: 'UNLOCK-CASINO-SUIT',
+        useAccessory: true,
+    },
+    {
         id: 'example',
         name: 'サンプルページ（学校の制服）',
         skin: './skins/example.png',
