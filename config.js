@@ -67,7 +67,7 @@ const EVENTS = [
         lock: false,
         lockSecret: 'UNLOCK-CASINO-SUIT',
         useAccessory: false,
-    },
+    }
     // --- 新しい企画を追加する場合は、この下にコピーして追記 ---
     // {
     //     id: 'new_event',
