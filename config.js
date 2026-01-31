@@ -11,7 +11,7 @@ const EVENTS = [
         textColor: '#000000', // タイトル色
         titleFont: 'Kaisei Tokumin', // タイトルフォント
         descriptionFont: 'Kaisei HarunoUmi', // 説明文フォント
-        lock: true, // ロックの有無
+        lock: false, // ロックの有無
         lockSecret: 'UNLOCK-CASINO-SUIT', // 暗号キーの元
         useAccessory: false, // trueにすると衣装の頭パーツを合成する
     },
@@ -24,7 +24,7 @@ const EVENTS = [
         textColor: '#ff69b4',
         titleFont: 'Hachi Maru Pop',
         descriptionFont: 'Kaisei HarunoUmi',
-        lock: true,
+        lock: false,
         lockSecret: 'UNLOCK-CASINO-BUNNY',
         useAccessory: false,
     },
