@@ -1,8 +1,39 @@
-// EasySkinMixer - Main Logic
-console.log("EasySkinMixer: プレビューのスクリプトを読み込みました。");
-
+// ===== ローディング画面の制御 =====
 document.addEventListener('DOMContentLoaded', () => {
-    // UI要素の取得
+    const loadingScreen = document.getElementById('loading-screen');
+    const percentEl = document.getElementById('progress-percent');
+    const barEl = document.getElementById('progress-bar');
+    const containerEl = document.querySelector('.container');
+    const loadingDuration = 3000;
+    const startTime = Date.now();
+    function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function updateProgress() {
+        const elapsedTime = Date.now() - startTime;
+        const timeFraction = Math.min(1, elapsedTime / loadingDuration);
+        const easedProgress = easeInOutCubic(timeFraction);
+        const percent = Math.floor(easedProgress * 100);
+        percentEl.textContent = `${percent}%`;
+        barEl.style.width = `${percent}%`;
+        if (timeFraction < 1) { requestAnimationFrame(updateProgress); }
+        else { percentEl.textContent = '100%'; barEl.style.width = '100%'; finishLoadingAnimation(); }
+    }
+    function finishLoadingAnimation() {
+        setTimeout(() => {
+            loadingScreen.classList.add('loaded');
+            setTimeout(() => {
+                loadingScreen.classList.add('gate-open');
+                containerEl.style.visibility = 'visible';
+                document.body.style.overflow = 'auto';
+            }, 1200);
+            setTimeout(() => { loadingScreen.style.display = 'none'; }, 2200);
+        }, 400);
+    }
+    requestAnimationFrame(updateProgress);
+    initializeMainContent();
+});
+
+// ===== メインコンテンツの処理 =====
+function initializeMainContent() {
     const containerEl = document.querySelector('.container');
     const eventNameEl = document.getElementById('event-name');
     const eventLogoEl = document.getElementById('event-logo');
@@ -17,78 +48,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMessageEl = document.getElementById('error-message');
     const mixerUiEl = document.getElementById('mixer-ui');
     const loadingMessageEl = document.getElementById('loading-message');
-
     const skinCtx = skinCanvas.getContext('2d');
     const previewCtx = previewCanvas.getContext('2d');
-
     const params = new URLSearchParams(window.location.search);
     const eventId = params.get('event');
 
-    if (!eventId) {
-        showError('無効なURLです。企画IDが指定されていません。');
-        return;
-    }
+    if (!eventId) { showError('無効なURLです。企画IDが指定されていません。'); return; }
     const currentEvent = EVENTS.find(e => e.id === eventId);
-    if (!currentEvent) {
-        showError('指定された企画が見つかりませんでした。');
-        return;
-    }
+    if (!currentEvent) { showError('指定された企画が見つかりませんでした。'); return; }
 
-    // ===== ここから背景設定のロジック =====
-    // 1. 背景画像が指定されている場合 (bgImageを優先)
     if (currentEvent.bgImage) {
         document.body.style.backgroundImage = `url(${currentEvent.bgImage})`;
         containerEl.classList.add('bg-image-mode');
         uploadAreaEl.classList.add('bg-image-mode');
-
-        // 背景画像の場合、タイトル以外の文字色は黒に固定
-        containerEl.style.setProperty('--text-color', '#333'); 
-        
-        // タイトルのみconfig.jsで指定された色を使用
-        if (currentEvent.textColor) {
-            containerEl.style.setProperty('--header-color', currentEvent.textColor);
-        } else {
-            // textColorが指定されていない場合は、デフォルトの青を使用
-            containerEl.style.setProperty('--header-color', '#1a73e8'); 
-        }
-
-    }
-    // 2. 背景色が指定されている場合
-    else if (currentEvent.bgColor) {
+        containerEl.style.setProperty('--text-color', '#333');
+        if (currentEvent.textColor) { containerEl.style.setProperty('--header-color', currentEvent.textColor); }
+        else { containerEl.style.setProperty('--header-color', '#1a73e8'); }
+    } else if (currentEvent.bgColor) {
         document.body.style.backgroundColor = currentEvent.bgColor;
-        // textColorの指定があればそれを使い、なければ自動調整する
-        if (currentEvent.textColor) {
-            updateContainerColor(currentEvent.bgColor, currentEvent.textColor);
-        } else {
-            updateContainerColor(currentEvent.bgColor);
-        }
+        if (currentEvent.textColor) { updateContainerColor(currentEvent.bgColor, currentEvent.textColor); }
+        else { updateContainerColor(currentEvent.bgColor); }
     }
-    // ===== 背景設定のロジックここまで =====
 
     eventNameEl.textContent = currentEvent.name;
     descriptionEl.textContent = `あなたのスキンをアップロードして、「${currentEvent.name}」限定スキンと合成しよう！`;
-    if (currentEvent.logo) {
-        eventLogoEl.src = currentEvent.logo;
-        eventLogoEl.style.display = 'block';
-    }
+    if (currentEvent.logo) { eventLogoEl.src = currentEvent.logo; eventLogoEl.style.display = 'block'; }
 
     const costumeImg = new Image();
     costumeImg.crossOrigin = "anonymous";
     costumeImg.src = currentEvent.skin;
+    costumeImg.onload = () => { loadingMessageEl.style.display = 'none'; mixerUiEl.style.display = 'block'; };
+    costumeImg.onerror = () => { showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。'); };
 
-    costumeImg.onload = () => {
-        loadingMessageEl.style.display = 'none';
-        mixerUiEl.style.display = 'block';
-    };
-    costumeImg.onerror = () => {
-        showError('企画スキン画像の読み込みに失敗しました。パスが正しいか確認してください。');
-    };
-
+    // ===== ファイル選択時のアニメーション処理を修正 =====
     uploader.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         fileNameEl.textContent = file.name;
         errorMessageEl.textContent = '';
+
+        // アニメーションをリセット
+        previewArea.classList.remove('visible');
+        previewCanvas.classList.remove('visible');
+        downloadButton.classList.remove('visible');
+        
+        // previewAreaを即座に表示状態にする (max-heightアニメーションはまだ始まらない)
+        previewArea.style.display = 'block';
+
         const reader = new FileReader();
         reader.onload = (event) => {
             const userSkinImg = new Image();
@@ -101,83 +107,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 mixSkins(userSkinImg, costumeImg);
                 drawPreview(skinCanvas);
-                previewArea.style.display = 'block';
+
+                // 1. プレビューエリアを伸ばす
+                // プレビューエリアがdisplay:block;になった後、少し待ってからvisibleクラスを追加
+                setTimeout(() => {
+                    previewArea.classList.add('visible');
+                    // max-heightアニメーション完了後にスクロール開始
+                    // CSSのmax-height transition duration (0.8s) + 少しの余裕 (0.2s)
+                    setTimeout(() => {
+                        previewArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 1000); // 1.0秒後
+                }, 100); // 0.1秒後
+
+                // 2. プレビュー画像をフェードイン
+                setTimeout(() => {
+                    previewCanvas.classList.add('visible');
+                }, 1800); // 1.8秒後 (変更)
+
+                // 3. ダウンロードボタンをスライドイン
+                setTimeout(() => {
+                    downloadButton.classList.add('visible');
+                }, 2200); // 2.2秒後 (変更)
+
             };
             userSkinImg.src = event.target.result;
         };
         reader.readAsDataURL(file);
     });
-
-    /**
-     * 背景色に合わせてコンテナの配色を更新する関数
-     * @param {string} hexColor - #RRGGBB形式のカラーコード
-     * @param {string} [textColor] - (任意) #RRGGBB形式の文字色
-     */
+    
     function updateContainerColor(hexColor, textColor) {
-        const r = parseInt(hexColor.substr(1, 2), 16);
-        const g = parseInt(hexColor.substr(3, 2), 16);
-        const b = parseInt(hexColor.substr(5, 2), 16);
-
+        const r = parseInt(hexColor.substr(1, 2), 16), g = parseInt(hexColor.substr(3, 2), 16), b = parseInt(hexColor.substr(5, 2), 16);
         const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-
-        // textColorが指定されていればそれを使い、なければ自動判定
         const finalTextColor = textColor ? textColor : (yiq >= 128 ? '#333' : '#f8f9fa');
-
-        // ヘッダーの色も同じ色に設定
         containerEl.style.setProperty('--header-color', finalTextColor);
-
         if (yiq >= 128) {
-            // 明るい背景
             containerEl.style.setProperty('--container-bg', 'rgba(0, 0, 0, 0.05)');
             containerEl.style.setProperty('--text-color', finalTextColor);
             containerEl.style.setProperty('--upload-area-bg', 'rgba(0, 0, 0, 0.03)');
             containerEl.style.setProperty('--upload-area-border', 'rgba(0, 0, 0, 0.2)');
         } else {
-            // 暗い背景
             containerEl.style.setProperty('--container-bg', 'rgba(255, 255, 255, 0.1)');
             containerEl.style.setProperty('--text-color', finalTextColor);
             containerEl.style.setProperty('--upload-area-bg', 'rgba(255, 255, 255, 0.05)');
             containerEl.style.setProperty('--upload-area-border', 'rgba(255, 255, 255, 0.2)');
         }
     }
-
     function mixSkins(userSkin, costume) {
         skinCtx.clearRect(0, 0, 64, 64);
         skinCtx.drawImage(costume, 0, 0);
         skinCtx.clearRect(0, 0, 64, 16);
         skinCtx.drawImage(userSkin, 0, 0, 64, 16, 0, 0, 64, 16);
-
         const mixedSkinUrl = skinCanvas.toDataURL('image/png');
         downloadButton.href = mixedSkinUrl;
         downloadButton.download = `EasySkinMixer_${currentEvent.id}_skin.png`;
     }
-
     function drawPreview(sourceCanvas) {
         const scale = 10;
         previewCanvas.width = 16 * scale;
         previewCanvas.height = 32 * scale;
         previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
         previewCtx.imageSmoothingEnabled = false;
-
-        const drawPart = (sx, sy, sw, sh, dx, dy) => {
-            previewCtx.drawImage(sourceCanvas, sx, sy, sw, sh, dx * scale, dy * scale, sw * scale, sh * scale);
-        };
-
-        drawPart(4, 20, 4, 12, 8, 20);  // 右脚
-        drawPart(44, 20, 4, 12, 12, 8); // 右腕
-        drawPart(20, 20, 8, 12, 4, 8);  // 胴体
-        drawPart(20, 36, 8, 12, 4, 8);  // 胴体上着
-        drawPart(4, 20, 4, 12, 4, 20);  // 左脚
-        drawPart(4, 36, 4, 12, 4, 20);  // 左脚上着
-        drawPart(44, 20, 4, 12, 0, 8);  // 左腕
-        drawPart(60, 20, 4, 12, 0, 8);  // 左腕上着
-        drawPart(8, 8, 8, 8, 4, 0);    // 頭
-        drawPart(40, 8, 8, 8, 4, 0);   // 頭上着
+        const drawPart = (sx, sy, sw, sh, dx, dy) => { previewCtx.drawImage(sourceCanvas, sx, sy, sw, sh, dx * scale, dy * scale, sw * scale, sh * scale); };
+        drawPart(4, 20, 4, 12, 8, 20); drawPart(44, 20, 4, 12, 12, 8); drawPart(20, 20, 8, 12, 4, 8); drawPart(20, 36, 8, 12, 4, 8);
+        drawPart(4, 20, 4, 12, 4, 20); drawPart(4, 36, 4, 12, 4, 20); drawPart(44, 20, 4, 12, 0, 8); drawPart(60, 20, 4, 12, 0, 8);
+        drawPart(8, 8, 8, 8, 4, 0); drawPart(40, 8, 8, 8, 4, 0);
     }
-
     function showError(message) {
         mixerUiEl.style.display = 'none';
         loadingMessageEl.style.display = 'none';
         errorMessageEl.textContent = message;
     }
-});
+}
